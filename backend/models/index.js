@@ -11,7 +11,18 @@ const db = {};
 
 let sequelize;
 if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+  // ADD A CONFIGURATION OBJECT
+  const sequelizeConfig = {
+    ...config,
+    dialectOptions: {
+      // This option forces Sequelize to use IPv4
+      family: 4,
+    },
+  };
+  sequelize = new Sequelize(
+    process.env[config.use_env_variable],
+    sequelizeConfig
+  );
 } else {
   sequelize = new Sequelize(
     config.database,
