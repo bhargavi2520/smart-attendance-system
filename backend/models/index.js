@@ -3,44 +3,33 @@
 const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
-const process = require("process");
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || "development";
-const config = require(__dirname + "/../config/config.json")[env];
 const db = {};
 
-let sequelize;
-if (config.use_env_variable) {
-  // ADD A CONFIGURATION OBJECT
-  const sequelizeConfig = {
-    ...config,
+// Use environment variables directly for Supabase
+const sequelize = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT || 5432,
+    dialect: "postgres",
     dialectOptions: {
-      // This option forces Sequelize to use IPv4
-      family: 4,
+      ssl: { rejectUnauthorized: false }, // Supabase requires SSL
     },
-  };
-  sequelize = new Sequelize(
-    process.env[config.use_env_variable],
-    sequelizeConfig
-  );
-} else {
-  sequelize = new Sequelize(
-    config.database,
-    config.username,
-    config.password,
-    config
-  );
-}
+  }
+);
 
+// Import all models in this folder
 fs.readdirSync(__dirname)
-  .filter((file) => {
-    return (
+  .filter(
+    (file) =>
       file.indexOf(".") !== 0 &&
       file !== basename &&
       file.slice(-3) === ".js" &&
       file.indexOf(".test.js") === -1
-    );
-  })
+  )
   .forEach((file) => {
     const model = require(path.join(__dirname, file))(
       sequelize,
@@ -49,6 +38,7 @@ fs.readdirSync(__dirname)
     db[model.name] = model;
   });
 
+// Setup associations if any
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
