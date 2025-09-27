@@ -24,9 +24,21 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         allowNull: false,
       },
+      // ADD rollNumber
+      rollNumber: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: true, // Allow null for non-students
+      },
+      // ADD googleId
+      googleId: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: true,
+      },
       password: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true, // Allow null for users who only use Google login
       },
       role: {
         type: DataTypes.ENUM(
@@ -57,8 +69,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  // Instance method to check password
   User.prototype.validPassword = async function (password) {
+    if (!this.password) return false;
     return await bcrypt.compare(password, this.password);
   };
 

@@ -20,6 +20,8 @@ module.exports = {
           id: 1,
           name: "Dr. Evelyn Reed",
           email: "principal@test.com",
+          rollNumber: null, // Non-students don't have a roll number
+          googleId: null, // Initially null for all users
           password: password,
           role: "PRINCIPAL",
           department: null,
@@ -32,72 +34,23 @@ module.exports = {
           id: 2,
           name: "Dr. Alan Grant",
           email: "hod@test.com",
+          rollNumber: null,
+          googleId: null,
           password: password,
           role: "HOD",
           department: "Computer Science",
           createdAt: now,
           updatedAt: now,
         },
-        {
-          id: 3,
-          name: "Dr. Ellie Sattler",
-          email: "hod.mech@test.com",
-          password: password,
-          role: "HOD",
-          department: "Mechanical",
-          createdAt: now,
-          updatedAt: now,
-        },
+        // ... (other non-student users will also have rollNumber: null)
 
-        // INCHARGE (ID: 4)
-        {
-          id: 4,
-          name: "Prof. Ian Malcolm",
-          email: "incharge@test.com",
-          password: password,
-          role: "INCHARGE",
-          department: "Computer Science",
-          createdAt: now,
-          updatedAt: now,
-        },
-
-        // FACULTY (ID: 5, 6, 7)
-        {
-          id: 5,
-          name: "Prof. Robert Muldoon",
-          email: "faculty@test.com",
-          password: password,
-          role: "FACULTY",
-          department: "Computer Science",
-          createdAt: now,
-          updatedAt: now,
-        },
-        {
-          id: 6,
-          name: "Prof. Dennis Nedry",
-          email: "faculty2@test.com",
-          password: password,
-          role: "FACULTY",
-          department: "Computer Science",
-          createdAt: now,
-          updatedAt: now,
-        },
-        {
-          id: 7,
-          name: "Prof. John Hammond",
-          email: "faculty.mech@test.com",
-          password: password,
-          role: "FACULTY",
-          department: "Mechanical",
-          createdAt: now,
-          updatedAt: now,
-        },
-
-        // STUDENTS (ID: 101 - 105)
+        // STUDENTS (ID: 101 - 105) - MODIFIED
         {
           id: 101,
           name: "Ada Lovelace",
           email: "student@test.com",
+          rollNumber: "CS101", // ADD a unique roll number for each student
+          googleId: null,
           password: password,
           role: "STUDENT",
           department: "Computer Science",
@@ -108,6 +61,8 @@ module.exports = {
           id: 102,
           name: "Charles Babbage",
           email: "student2@test.com",
+          rollNumber: "CS102", // ADD a unique roll number
+          googleId: null,
           password: password,
           role: "STUDENT",
           department: "Computer Science",
@@ -118,6 +73,8 @@ module.exports = {
           id: 103,
           name: "Grace Hopper",
           email: "student3@test.com",
+          rollNumber: "CS103", // ADD a unique roll number
+          googleId: null,
           password: password,
           role: "STUDENT",
           department: "Computer Science",
@@ -128,6 +85,8 @@ module.exports = {
           id: 104,
           name: "James Watt",
           email: "student.mech@test.com",
+          rollNumber: "ME101", // ADD a unique roll number
+          googleId: null,
           password: password,
           role: "STUDENT",
           department: "Mechanical",
@@ -138,6 +97,8 @@ module.exports = {
           id: 105,
           name: "Nikola Tesla",
           email: "student.mech2@test.com",
+          rollNumber: "ME102", // ADD a unique roll number
+          googleId: null,
           password: password,
           role: "STUDENT",
           department: "Mechanical",
