@@ -15,6 +15,9 @@ const analyticsRoutes = require("./routes/analyticsRoutes");
 
 const app = express();
 
+// ADD THIS LINE to trust Render's proxy
+app.set("trust proxy", 1);
+
 // Middleware
 app.use(
   cors({
