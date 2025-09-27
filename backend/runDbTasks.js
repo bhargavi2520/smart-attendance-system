@@ -1,22 +1,43 @@
 // backend/runDbTasks.js
+const { Umzug, SequelizeStorage } = require("umzug");
+const db = require("./models");
+const sequelize = db.sequelize;
 
-const { execSync } = require("child_process");
+console.log("Starting programmatic database tasks...");
 
-console.log("Starting database tasks...");
+const migrator = new Umzug({
+  migrations: { glob: "migrations/*.js" },
+  context: sequelize.getQueryInterface(),
+  storage: new SequelizeStorage({ sequelize }),
+  logger: console,
+});
 
-try {
-  console.log("Running database migrations...");
-  // The { stdio: 'inherit' } option pipes the output to the console in real-time
-  execSync("npx sequelize-cli db:migrate", { stdio: "inherit" });
-  console.log("Migrations completed successfully.");
+const seeder = new Umzug({
+  migrations: { glob: "seeders/*.js" },
+  context: sequelize.getQueryInterface(),
+  storage: new SequelizeStorage({
+    sequelize,
+    modelName: "SequelizeData-seeds",
+  }),
+  logger: console,
+});
 
-  console.log("Running database seeders...");
-  execSync("npx sequelize-cli db:seed:all", { stdio: "inherit" });
-  console.log("Seeders completed successfully.");
+const runTasks = async () => {
+  try {
+    console.log("Running database migrations...");
+    await migrator.up();
+    console.log("Migrations completed successfully.");
 
-  console.log("Database tasks finished.");
-  process.exit(0);
-} catch (error) {
-  console.error("Failed to complete database tasks:", error);
-  process.exit(1);
-}
+    console.log("Running database seeders...");
+    await seeder.up();
+    console.log("Seeders completed successfully.");
+
+    console.log("Database tasks finished.");
+    process.exit(0);
+  } catch (error) {
+    console.error("Failed to complete database tasks:", error);
+    process.exit(1);
+  }
+};
+
+runTasks();
