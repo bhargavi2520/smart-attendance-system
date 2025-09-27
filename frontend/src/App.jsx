@@ -7,12 +7,17 @@ import Dashboard from "./pages/Dashboard";
 import MyAttendance from "./pages/student/MyAttendance";
 import MarkAttendance from "./pages/faculty/MarkAttendance";
 import NotFound from "./pages/NotFound";
+import ForgotPassword from "./pages/ForgotPassword"; // <-- ADD IMPORT
+import ResetPassword from "./pages/ResetPassword"; // <-- ADD IMPORT
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-
+      <Route path="/forgot-password" element={<ForgotPassword />} />{" "}
+      {/* <-- ADD ROUTE */}
+      <Route path="/reset-password/:token" element={<ResetPassword />} />{" "}
+      {/* <-- ADD ROUTE */}
       <Route
         path="/"
         element={
@@ -38,9 +43,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* Add more role-specific routes here inside the Layout */}
       </Route>
-
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
