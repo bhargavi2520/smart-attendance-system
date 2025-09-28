@@ -11,22 +11,30 @@ module.exports = {
       },
       name: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       email: {
         type: Sequelize.STRING,
+        allowNull: false,
         unique: true,
       },
       password: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       role: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM(
+          "STUDENT",
+          "FACULTY",
+          "INCHARGE",
+          "HOD",
+          "PRINCIPAL"
+        ),
+        allowNull: false,
       },
-      rollNumber: {
+      department: {
         type: Sequelize.STRING,
-      },
-      googleId: {
-        type: Sequelize.STRING,
+        allowNull: true, // Null for principal, maybe students
       },
       createdAt: {
         allowNull: false,
