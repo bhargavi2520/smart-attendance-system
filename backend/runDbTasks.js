@@ -1,43 +1,21 @@
 // backend/runDbTasks.js
-const { Umzug, SequelizeStorage } = require("umzug");
-const db = require("./models");
-const sequelize = db.sequelize;
 
-console.log("Starting programmatic database tasks...");
+// This imports your database connection from models/index.js
+const { sequelize } = require("./models");
 
-const migrator = new Umzug({
-  migrations: { glob: "migrations/*.js" },
-  context: sequelize.getQueryInterface(),
-  storage: new SequelizeStorage({ sequelize }),
-  logger: console,
-});
-
-const seeder = new Umzug({
-  migrations: { glob: "seeders/*.js" },
-  context: sequelize.getQueryInterface(),
-  storage: new SequelizeStorage({
-    sequelize,
-    modelName: "SequelizeData-seeds",
-  }),
-  logger: console,
-});
-
-const runTasks = async () => {
+async function syncDatabase() {
+  console.log("Starting database synchronization...");
   try {
-    console.log("Running database migrations...");
-    await migrator.up();
-    console.log("Migrations completed successfully.");
-
-    console.log("Running database seeders...");
-    await seeder.up();
-    console.log("Seeders completed successfully.");
-
-    console.log("Database tasks finished.");
-    process.exit(0);
+    // This command reads your models and creates the tables.
+    // { force: true } drops tables if they exist, ensuring a clean start.
+    await sequelize.sync({ force: true });
+    console.log("Database synchronized successfully.");
+    process.exit(0); // Exit successfully
   } catch (error) {
-    console.error("Failed to complete database tasks:", error);
-    process.exit(1);
+    console.error("Failed to synchronize database:", error);
+    process.exit(1); // Exit with an error to fail the build
   }
-};
+}
 
-runTasks();
+// Run the function
+syncDatabase();
