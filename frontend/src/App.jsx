@@ -9,7 +9,8 @@ import MarkAttendance from "./pages/faculty/MarkAttendance";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPassword"; // <-- ADD IMPORT
 import ResetPassword from "./pages/ResetPassword"; // <-- ADD IMPORT
-
+import UserList from "./pages/admin/UserList";
+import UserForm from "./pages/admin/UserForm";
 function App() {
   return (
     <Routes>
@@ -40,6 +41,44 @@ function App() {
           element={
             <ProtectedRoute roles={["FACULTY"]}>
               <MarkAttendance />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Dashboard />} />
+        <Route path="my-attendance" /* ... */ />
+        <Route path="mark-attendance/:timetableId" /* ... */ />
+
+        {/* ADMIN ROUTES */}
+        <Route
+          path="admin/users"
+          element={
+            <ProtectedRoute roles={["ADMIN"]}>
+              <UserList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/users/add"
+          element={
+            <ProtectedRoute roles={["ADMIN"]}>
+              <UserForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/users/edit/:id"
+          element={
+            <ProtectedRoute roles={["ADMIN"]}>
+              <UserForm />
             </ProtectedRoute>
           }
         />

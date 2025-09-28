@@ -4,6 +4,7 @@ import FacultyDashboard from "./dashboards/FacultyDashboard";
 import HodDashboard from "./dashboards/HodDashboard";
 import PrincipalDashboard from "./dashboards/PrincipalDashboard";
 import Spinner from "../components/ui/Spinner";
+import { Navigate } from "react-router-dom";
 
 // This component acts as a router for different user roles
 const Dashboard = () => {
@@ -29,6 +30,8 @@ const Dashboard = () => {
       return <HodDashboard />;
     case "PRINCIPAL":
       return <PrincipalDashboard />;
+    case "ADMIN":
+      return <Navigate to="/admin/users" replace />;
     default:
       return <div>Invalid user role or not logged in.</div>;
   }

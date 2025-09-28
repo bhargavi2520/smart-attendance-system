@@ -1,5 +1,6 @@
+import { Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { LogOut, User as UserIcon, Shield } from "lucide-react";
 
 const Header = () => {
   const { user, logout } = useAuth();
@@ -9,13 +10,24 @@ const Header = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <h1 className="text-xl font-bold text-gray-800">
+            <Link to="/" className="text-xl font-bold text-gray-800">
               Smart Attendance
-            </h1>
+            </Link>
           </div>
           <div className="flex items-center">
             <div className="relative ml-3">
               <div className="flex items-center space-x-4">
+                {/* CONDITIONAL ADMIN LINK */}
+                {user && user.role === "ADMIN" && (
+                  <Link
+                    to="/admin/users"
+                    className="flex items-center text-gray-600 hover:text-indigo-600"
+                  >
+                    <Shield className="h-5 w-5 mr-1" />
+                    <span>Admin</span>
+                  </Link>
+                )}
+
                 <div className="text-right">
                   <p className="text-sm font-medium text-gray-800">
                     {user?.name}

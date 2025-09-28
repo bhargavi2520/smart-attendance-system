@@ -17,6 +17,18 @@ module.exports = {
       [
         // PRINCIPAL (ID: 1)
         {
+          id: 999, // A unique ID for the admin
+          name: "Site Admin",
+          email: "admin@test.com",
+          rollNumber: null,
+          googleId: null,
+          password: password, // This will use the default 'password123'
+          role: "ADMIN",
+          department: "Administration",
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
           id: 1,
           name: "Dr. Evelyn Reed",
           email: "principal@test.com",
