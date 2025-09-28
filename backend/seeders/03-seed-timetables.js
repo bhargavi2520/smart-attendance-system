@@ -65,6 +65,24 @@ module.exports = {
           createdAt: now,
           updatedAt: now,
         },
+        {
+          courseId: 1,
+          day: "Monday",
+          startTime: "09:00:00",
+          endTime: "10:00:00",
+          location: "Room 101",
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          courseId: 2,
+          day: "Tuesday",
+          startTime: "10:00:00",
+          endTime: "11:00:00",
+          location: "Room 102",
+          createdAt: now,
+          updatedAt: now,
+        },
       ],
       {}
     );

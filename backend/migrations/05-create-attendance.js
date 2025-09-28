@@ -11,7 +11,6 @@ module.exports = {
       },
       studentId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
         references: {
           model: "Users",
           key: "id",
@@ -19,11 +18,10 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },
-      timetableId: {
+      courseId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
         references: {
-          model: "Timetables",
+          model: "Courses",
           key: "id",
         },
         onUpdate: "CASCADE",
@@ -31,21 +29,9 @@ module.exports = {
       },
       date: {
         type: Sequelize.DATEONLY,
-        allowNull: false,
       },
       status: {
-        type: Sequelize.ENUM("PRESENT", "ABSENT"),
-        allowNull: false,
-      },
-      markedBy: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: "Users",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "SET NULL",
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,

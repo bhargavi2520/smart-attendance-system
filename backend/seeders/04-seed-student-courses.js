@@ -20,6 +20,20 @@ module.exports = {
         { studentId: 104, courseId: 4, createdAt: now, updatedAt: now },
         { studentId: 105, courseId: 3, createdAt: now, updatedAt: now },
         { studentId: 105, courseId: 4, createdAt: now, updatedAt: now },
+
+        // Additional entry for studentId 2
+        {
+          studentId: 2,
+          courseId: 1,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          studentId: 2,
+          courseId: 2,
+          createdAt: now,
+          updatedAt: now,
+        },
       ],
       {}
     );

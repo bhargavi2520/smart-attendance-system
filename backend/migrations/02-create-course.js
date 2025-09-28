@@ -9,18 +9,21 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      courseName: {
+      code: {
         type: Sequelize.STRING,
-        allowNull: false,
-      },
-      courseCode: {
-        type: Sequelize.STRING,
-        allowNull: false,
         unique: true,
       },
-      department: {
+      name: {
         type: Sequelize.STRING,
-        allowNull: false,
+      },
+      facultyId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "Users",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
       },
       createdAt: {
         allowNull: false,

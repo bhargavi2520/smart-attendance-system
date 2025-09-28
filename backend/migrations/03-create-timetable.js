@@ -11,7 +11,6 @@ module.exports = {
       },
       courseId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
         references: {
           model: "Courses",
           key: "id",
@@ -19,27 +18,17 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },
-      facultyId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: "Users",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "SET NULL",
-      },
-      dayOfWeek: {
+      day: {
         type: Sequelize.STRING,
-        allowNull: false,
       },
       startTime: {
         type: Sequelize.TIME,
-        allowNull: false,
       },
       endTime: {
         type: Sequelize.TIME,
-        allowNull: false,
+      },
+      location: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
