@@ -1,21 +1,20 @@
 "use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  // The 'up' migration runs when you deploy
+  // The 'up' migration must accept BOTH queryInterface and Sequelize
   async up(queryInterface, Sequelize) {
-    // 1. Create the table
     await queryInterface.createTable("StudentCourses", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER, // This now works because Sequelize is defined above
       },
       studentId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "Users", // This MUST match the table name for users
+          model: "Users",
           key: "id",
         },
         onUpdate: "CASCADE",
@@ -25,7 +24,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "Courses", // This MUST match the table name for courses
+          model: "Courses",
           key: "id",
         },
         onUpdate: "CASCADE",
@@ -43,7 +42,7 @@ module.exports = {
       },
     });
 
-    // 2. Add the unique constraint to prevent duplicates
+    // This adds the unique constraint to prevent duplicates
     await queryInterface.addConstraint("StudentCourses", {
       fields: ["studentId", "courseId"],
       type: "unique",
@@ -51,9 +50,8 @@ module.exports = {
     });
   },
 
-  // The 'down' migration runs when you revert/undo
+  // The 'down' migration must also accept both
   async down(queryInterface, Sequelize) {
-    // It must reverse the 'up' function, in reverse order
     await queryInterface.removeConstraint(
       "StudentCourses",
       "student_course_unique_constraint"
