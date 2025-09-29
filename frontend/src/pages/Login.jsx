@@ -38,7 +38,7 @@ export default function Login() {
   // Handle Google Login button click
   const handleGoogleLogin = () => {
     // Add "/api" right before "/auth/google"
-    window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
   };
   // Handle Forgot Password button click
   const handleForgotPassword = () => {
