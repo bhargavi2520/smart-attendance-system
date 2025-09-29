@@ -14,7 +14,6 @@ const generateToken = (id, role, department) => {
   });
 };
 
-// MODIFIED FOR ROLL NUMBER AND REMEMBER ME
 exports.login = async (req, res) => {
   try {
     const { identifier, password, rememberMe } = req.body;
@@ -25,31 +24,32 @@ exports.login = async (req, res) => {
       },
     });
 
-    // 🔹 ADD DEBUG LOGS
-    console.log("Incoming identifier:", identifier);
-    console.log("DB stored hash:", user ? user.password : "User not found");
-    const match = user ? await user.validPassword(password) : false;
-    console.log("Password match?", match);
-
-    if (user && match) {
-      const token = jwt.sign(
-        { id: user.id, role: user.role, department: user.department },
-        process.env.JWT_SECRET,
-        { expiresIn: rememberMe ? "1d" : "3h" } // Set expiration based on rememberMe
-      );
-
-      res.json({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        department: user.department,
-        token: token,
-      });
-    } else {
-      res.status(401).json({ message: "Invalid credentials" });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
+
+    const match = await user.validPassword(password);
+
+    if (!match) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, role: user.role, department: user.department },
+      process.env.JWT_SECRET,
+      { expiresIn: rememberMe ? "1d" : "3h" }
+    );
+
+    res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      department: user.department,
+      token,
+    });
   } catch (error) {
+    console.error("Login error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
