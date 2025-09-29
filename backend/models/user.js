@@ -19,25 +19,33 @@ module.exports = (sequelize, DataTypes) => {
 
   User.init(
     {
-      name: DataTypes.STRING,
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        field: 'name'
+      },
       email: {
         type: DataTypes.STRING,
         unique: true,
         allowNull: false,
+        field: 'email'
       },
       rollNumber: {
         type: DataTypes.STRING,
         unique: true,
         allowNull: true, // Allow null for non-students
+        field: 'rollnumber'
       },
       googleId: {
         type: DataTypes.STRING,
         unique: true,
         allowNull: true,
+        field: 'googleid'
       },
       password: {
         type: DataTypes.STRING,
         allowNull: true, // Allow null for users who only use Google login
+        field: 'password'
       },
       role: {
         type: DataTypes.ENUM(
@@ -49,25 +57,41 @@ module.exports = (sequelize, DataTypes) => {
           "PRINCIPAL"
         ),
         allowNull: false,
+        field: 'role'
       },
       department: {
         type: DataTypes.STRING,
         allowNull: true,
+        field: 'department'
       },
       passwordResetToken: {
         type: DataTypes.STRING,
         allowNull: true,
+        field: 'passwordresettoken'
       },
       passwordResetExpires: {
         type: DataTypes.DATE,
         allowNull: true,
+        field: 'passwordresetexpires'
       },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: 'createdat'
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: 'updatedat'
+      }
     },
     {
       sequelize,
       modelName: "User",
-      tableName: "users", // force lowercase table name
-      freezeTableName: true, // don't pluralize
+      tableName: "users",
+      timestamps: true,
+      createdAt: 'createdAt',
+      updatedAt: 'updatedAt',
       hooks: {
         beforeCreate: async (user) => {
           if (user.password) {

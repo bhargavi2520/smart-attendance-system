@@ -18,15 +18,44 @@ module.exports = (sequelize, DataTypes) => {
   }
   Timetable.init(
     {
-      courseId: DataTypes.INTEGER,
-      facultyId: DataTypes.INTEGER,
-      dayOfWeek: DataTypes.STRING,
-      startTime: DataTypes.TIME,
-      endTime: DataTypes.TIME,
+      courseId: {
+        type: DataTypes.INTEGER,
+        field: 'courseid'
+      },
+      facultyId: {
+        type: DataTypes.INTEGER,
+        field: 'facultyid'
+      },
+      dayOfWeek: {
+        type: DataTypes.STRING,
+        field: 'dayofweek'
+      },
+      startTime: {
+        type: DataTypes.TIME,
+        field: 'starttime'
+      },
+      endTime: {
+        type: DataTypes.TIME,
+        field: 'endtime'
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: 'createdat'
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: 'updatedat'
+      }
     },
     {
       sequelize,
       modelName: "Timetable",
+      tableName: "timetables",
+      timestamps: true,
+      createdAt: 'createdAt',
+      updatedAt: 'updatedAt'
     }
   );
   return Timetable;

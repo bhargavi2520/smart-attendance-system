@@ -20,12 +20,32 @@ module.exports = (sequelize, DataTypes) => {
   }
   StudentCourse.init(
     {
-      studentId: DataTypes.INTEGER,
-      courseId: DataTypes.INTEGER,
+      studentId: {
+        type: DataTypes.INTEGER,
+        field: 'studentid'
+      },
+      courseId: {
+        type: DataTypes.INTEGER,
+        field: 'courseid'
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: 'createdat'
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: 'updatedat'
+      }
     },
     {
       sequelize,
       modelName: "StudentCourse",
+      tableName: "studentcourses",
+      timestamps: true,
+      createdAt: 'createdAt',
+      updatedAt: 'updatedAt'
     }
   );
   return StudentCourse;
