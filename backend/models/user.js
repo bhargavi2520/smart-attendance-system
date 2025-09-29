@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
   }
+
   User.init(
     {
       name: DataTypes.STRING,
@@ -24,13 +25,11 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         allowNull: false,
       },
-      // ADD rollNumber
       rollNumber: {
         type: DataTypes.STRING,
         unique: true,
         allowNull: true, // Allow null for non-students
       },
-      // ADD googleId
       googleId: {
         type: DataTypes.STRING,
         unique: true,
@@ -67,6 +66,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "User",
+      tableName: "users", // force lowercase table name
+      freezeTableName: true, // don't pluralize
       hooks: {
         beforeCreate: async (user) => {
           if (user.password) {
