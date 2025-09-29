@@ -5,12 +5,17 @@ const {
   login,
   getMe,
   googleCallback,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
 
 // Traditional Login
 router.post("/login", login);
 router.get("/me", protect, getMe);
+
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password/:token", resetPassword);
 
 // Google OAuth Routes
 router.get(

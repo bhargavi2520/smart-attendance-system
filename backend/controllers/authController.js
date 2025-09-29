@@ -4,6 +4,7 @@ const { Op } = require("sequelize"); // Import Op
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const User = db.User;
+const { Resend } = require("resend");
 
 const generateToken = (id, role, department) => {
   // Use a short expiration for normal logins
@@ -77,43 +78,58 @@ exports.getMe = async (req, res) => {
 };
 
 exports.forgotPassword = async (req, res) => {
+  // 2. INITIALIZE RESEND WITH YOUR API KEY
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
   try {
     const user = await User.findOne({ where: { email: req.body.email } });
+
     if (!user) {
-      // Note: Don't reveal if a user exists or not for security reasons
       return res.status(200).json({
         message:
           "If a user with that email exists, a reset link has been sent.",
       });
     }
 
+    // Generate token and save it to the database (same as before)
     const resetToken = crypto.randomBytes(32).toString("hex");
     user.passwordResetToken = crypto
       .createHash("sha256")
       .update(resetToken)
       .digest("hex");
-    user.passwordResetExpires = Date.now() + 10 * 60 * 1000; // Expires in 10 minutes
-
+    user.passwordResetExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
     await user.save();
 
-    // IMPORTANT: Use your Vercel URL here for the link to work in production
     const resetURL = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
-    const transporter = nodemailer.createTransport({
-      /* your email config */
-    });
+    // --- START: RESEND EMAIL LOGIC ---
 
-    await transporter.sendMail({
+    // 3. SEND THE EMAIL
+    await resend.emails.send({
+      from: "Smart Attendance <onboarding@resend.dev>", // <-- Use your verified domain
       to: user.email,
-      from: "Password Support <no-reply@yourdomain.com>",
-      subject: "Your Password Reset Link",
-      text: `Click this link to reset your password: ${resetURL}`,
+      subject: "Password Reset Request",
+      html: `
+        <p>Hello ${user.name},</p>
+        <p>You requested a password reset. Please click the link below to set a new password. This link will expire in 15 minutes.</p>
+        <a href="${resetURL}" style="background-color: #4f46e5; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">Reset Your Password</a>
+        <p>If you did not request this, please ignore this email.</p>
+      `,
     });
 
-    res.status(200).json({ message: "Email sent" });
+    // --- END: RESEND EMAIL LOGIC ---
+
+    res.status(200).json({
+      message:
+        "If an account with that email exists, a reset link has been sent.",
+    });
   } catch (error) {
-    // Handle errors without leaking info
-    res.status(500).json({ message: "Error processing request" });
+    console.error("FORGOT PASSWORD ERROR:", error);
+    // Even if sending fails, send a generic message for security
+    res.status(200).json({
+      message:
+        "If an account with that email exists, a reset link has been sent.",
+    });
   }
 };
 

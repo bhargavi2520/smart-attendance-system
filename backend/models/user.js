@@ -22,30 +22,30 @@ module.exports = (sequelize, DataTypes) => {
       name: {
         type: DataTypes.STRING,
         allowNull: false,
-        field: 'name'
+        field: "name",
       },
       email: {
         type: DataTypes.STRING,
         unique: true,
         allowNull: false,
-        field: 'email'
+        field: "email",
       },
       rollNumber: {
         type: DataTypes.STRING,
         unique: true,
         allowNull: true, // Allow null for non-students
-        field: 'rollnumber'
+        field: "rollnumber",
       },
       googleId: {
         type: DataTypes.STRING,
         unique: true,
         allowNull: true,
-        field: 'googleid'
+        field: "googleid",
       },
       password: {
         type: DataTypes.STRING,
         allowNull: true, // Allow null for users who only use Google login
-        field: 'password'
+        field: "password",
       },
       role: {
         type: DataTypes.ENUM(
@@ -57,44 +57,50 @@ module.exports = (sequelize, DataTypes) => {
           "PRINCIPAL"
         ),
         allowNull: false,
-        field: 'role'
+        field: "role",
       },
       department: {
         type: DataTypes.STRING,
         allowNull: true,
-        field: 'department'
+        field: "department",
       },
       passwordResetToken: {
         type: DataTypes.STRING,
         allowNull: true,
-        field: 'passwordresettoken'
+        field: "passwordresettoken",
       },
       passwordResetExpires: {
         type: DataTypes.DATE,
         allowNull: true,
-        field: 'passwordresetexpires'
+        field: "passwordresetexpires",
       },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: 'createdat'
+        field: "createdat",
       },
       updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: 'updatedat'
-      }
+        field: "updatedat",
+      },
     },
     {
       sequelize,
       modelName: "User",
       tableName: "users",
       timestamps: true,
-      createdAt: 'createdAt',
-      updatedAt: 'updatedAt',
+      createdAt: "createdAt",
+      updatedAt: "updatedAt",
       hooks: {
         beforeCreate: async (user) => {
           if (user.password) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(user.password, salt);
+          }
+        },
+        beforeUpdate: async (user) => {
+          if (user.changed("password") && user.password) {
             const salt = await bcrypt.genSalt(10);
             user.password = await bcrypt.hash(user.password, salt);
           }

@@ -12,7 +12,7 @@ export default function ResetPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await api.patch(`/auth/reset-password/${token}`, {
+      const { data } = await api.post(`/auth/reset-password/${token}`, {
         password,
       });
       setMessage(data.message + " Redirecting to login...");
