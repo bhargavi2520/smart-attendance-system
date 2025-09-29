@@ -25,7 +25,13 @@ exports.login = async (req, res) => {
       },
     });
 
-    if (user && (await user.validPassword(password))) {
+    // 🔹 ADD DEBUG LOGS
+    console.log("Incoming identifier:", identifier);
+    console.log("DB stored hash:", user ? user.password : "User not found");
+    const match = user ? await user.validPassword(password) : false;
+    console.log("Password match?", match);
+
+    if (user && match) {
       const token = jwt.sign(
         { id: user.id, role: user.role, department: user.department },
         process.env.JWT_SECRET,
@@ -75,12 +81,10 @@ exports.forgotPassword = async (req, res) => {
     const user = await User.findOne({ where: { email: req.body.email } });
     if (!user) {
       // Note: Don't reveal if a user exists or not for security reasons
-      return res
-        .status(200)
-        .json({
-          message:
-            "If a user with that email exists, a reset link has been sent.",
-        });
+      return res.status(200).json({
+        message:
+          "If a user with that email exists, a reset link has been sent.",
+      });
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex");
