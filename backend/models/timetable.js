@@ -20,42 +20,41 @@ module.exports = (sequelize, DataTypes) => {
     {
       courseId: {
         type: DataTypes.INTEGER,
-        field: 'courseid'
+        field: "courseid",
       },
       facultyId: {
         type: DataTypes.INTEGER,
-        field: 'facultyid'
+        field: "facultyid",
       },
       dayOfWeek: {
         type: DataTypes.STRING,
-        field: 'dayofweek'
+        field: "dayofweek",
       },
       startTime: {
         type: DataTypes.TIME,
-        field: 'starttime'
+        field: "starttime",
       },
       endTime: {
         type: DataTypes.TIME,
-        field: 'endtime'
+        field: "endtime",
       },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: 'createdat'
+        field: "createdat",
       },
       updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: 'updatedat'
-      }
+        field: "updatedat",
+      },
     },
     {
       sequelize,
       modelName: "Timetable",
       tableName: "timetables",
       timestamps: true,
-      createdAt: 'createdAt',
-      updatedAt: 'updatedAt'
+      underscored: true,
     }
   );
   return Timetable;

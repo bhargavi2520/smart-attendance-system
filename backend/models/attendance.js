@@ -20,42 +20,41 @@ module.exports = (sequelize, DataTypes) => {
     {
       studentId: {
         type: DataTypes.INTEGER,
-        field: 'studentid'
+        field: "studentid",
       },
       timetableId: {
         type: DataTypes.INTEGER,
-        field: 'timetableid'
+        field: "timetableid",
       },
       date: {
         type: DataTypes.DATEONLY,
-        field: 'date'
+        field: "date",
       },
       status: {
         type: DataTypes.ENUM("PRESENT", "ABSENT"),
-        field: 'status'
+        field: "status",
       },
       markedBy: {
         type: DataTypes.INTEGER,
-        field: 'markedby'
+        field: "markedby",
       },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: 'createdat'
+        field: "createdat",
       },
       updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: 'updatedat'
-      }
+        field: "updatedat",
+      },
     },
     {
       sequelize,
       modelName: "Attendance",
       tableName: "attendances",
       timestamps: true,
-      createdAt: 'createdAt',
-      updatedAt: 'updatedAt'
+      underscored: true,
     }
   );
   return Attendance;

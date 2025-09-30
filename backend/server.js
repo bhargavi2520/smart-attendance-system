@@ -25,7 +25,7 @@ const allowedOrigins = [
   process.env.CLIENT_URL, // Your deployed frontend URL
   "http://localhost:5173", // Your local development URL
 ];
-
+console.log("Allowed Origins on Startup:", allowedOrigins);
 app.use(
   cors({
     origin: function (origin, callback) {

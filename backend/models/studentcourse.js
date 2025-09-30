@@ -22,30 +22,29 @@ module.exports = (sequelize, DataTypes) => {
     {
       studentId: {
         type: DataTypes.INTEGER,
-        field: 'studentid'
+        field: "studentid",
       },
       courseId: {
         type: DataTypes.INTEGER,
-        field: 'courseid'
+        field: "courseid",
       },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: 'createdat'
+        field: "createdat",
       },
       updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: 'updatedat'
-      }
+        field: "updatedat",
+      },
     },
     {
       sequelize,
       modelName: "StudentCourse",
-      tableName: "studentcourses",
+      tableName: "student_courses",
       timestamps: true,
-      createdAt: 'createdAt',
-      updatedAt: 'updatedAt'
+      underscored: true,
     }
   );
   return StudentCourse;
