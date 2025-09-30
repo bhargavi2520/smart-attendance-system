@@ -1,3 +1,4 @@
+// models/user.js
 "use strict";
 const { Model } = require("sequelize");
 const bcrypt = require("bcryptjs");
@@ -5,93 +6,56 @@ const bcrypt = require("bcryptjs");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      User.belongsToMany(models.Course, {
-        through: models.StudentCourse,
-        foreignKey: "studentId",
-        as: "studentCourses",
+      User.hasOne(models.StudentProfile, {
+        foreignKey: "userId",
+        as: "studentProfile",
       });
-      User.hasMany(models.Timetable, {
-        foreignKey: "facultyId",
-        as: "facultyClasses",
+
+      User.hasOne(models.FacultyProfile, {
+        foreignKey: "userId",
+        as: "facultyProfile",
+      });
+
+      User.belongsToMany(models.Role, {
+        through: "UserRole",
+        foreignKey: "userId",
+        as: "roles",
       });
     }
   }
 
   User.init(
     {
-      name: {
+      firstName: {
         type: DataTypes.STRING,
         allowNull: false,
-        field: "name",
+      },
+      lastName: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
       email: {
         type: DataTypes.STRING,
         unique: true,
         allowNull: false,
-        field: "email",
       },
-      rollNumber: {
+      password: {
         type: DataTypes.STRING,
-        unique: true,
-        allowNull: true, // Allow null for non-students
-        field: "rollnumber",
+        allowNull: true,
       },
       googleId: {
         type: DataTypes.STRING,
         unique: true,
         allowNull: true,
-        field: "googleid",
       },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: true, // Allow null for users who only use Google login
-        field: "password",
-      },
-      role: {
-        type: DataTypes.ENUM(
-          "ADMIN",
-          "STUDENT",
-          "FACULTY",
-          "INCHARGE",
-          "HOD",
-          "PRINCIPAL"
-        ),
-        allowNull: false,
-        field: "role",
-      },
-      department: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        field: "department",
-      },
-      passwordResetToken: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        field: "passwordresettoken",
-      },
-      passwordResetExpires: {
-        type: DataTypes.DATE,
-        allowNull: true,
-        field: "passwordresetexpires",
-      },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        field: "createdat",
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        field: "updatedat",
-      },
+      passwordResetToken: DataTypes.STRING,
+      passwordResetExpires: DataTypes.DATE,
     },
     {
       sequelize,
       modelName: "User",
       tableName: "users",
       timestamps: true,
-      createdAt: "createdAt",
-      updatedAt: "updatedAt",
       hooks: {
         beforeCreate: async (user) => {
           if (user.password) {

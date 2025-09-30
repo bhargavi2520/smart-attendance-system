@@ -6,9 +6,8 @@ import PrincipalDashboard from "./dashboards/PrincipalDashboard";
 import Spinner from "../components/ui/Spinner";
 import { Navigate } from "react-router-dom";
 
-// This component acts as a router for different user roles
 const Dashboard = () => {
-  const { user, loading } = useAuth();
+  const { user, activeRole, loading } = useAuth();
 
   if (loading || !user) {
     return (
@@ -18,22 +17,31 @@ const Dashboard = () => {
     );
   }
 
-  switch (user?.role) {
-    case "STUDENT":
+  // If user has multiple roles but hasn't selected one for the session, redirect.
+  if (user.roles.length > 1 && !activeRole) {
+    return <Navigate to="/select-role" replace />;
+  }
+
+  // Render dashboard based on the single active role.
+  switch (activeRole) {
+    case "student":
       return <StudentDashboard />;
-    case "FACULTY":
+    case "faculty":
       return <FacultyDashboard />;
-    case "INCHARGE":
-      // In this setup, Incharge shares a dashboard with HOD
+    case "hod":
       return <HodDashboard />;
-    case "HOD":
-      return <HodDashboard />;
-    case "PRINCIPAL":
+    case "principal":
       return <PrincipalDashboard />;
-    case "ADMIN":
+    case "admin":
       return <Navigate to="/admin/users" replace />;
     default:
-      return <div>Invalid user role or not logged in.</div>;
+      // This can happen if the role is invalid or if a single-role user logs in
+      // and their role hasn't been set as activeRole yet.
+      if (user.roles.length > 0) {
+        // If there's no active role, but there are roles, we might be waiting for context to update
+        return <Spinner />;
+      }
+      return <div>Invalid user role or dashboard not available.</div>;
   }
 };
 

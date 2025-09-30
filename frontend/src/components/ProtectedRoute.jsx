@@ -3,7 +3,7 @@ import useAuth from "../hooks/useAuth";
 import Spinner from "./ui/Spinner";
 
 const ProtectedRoute = ({ children, roles }) => {
-  const { user, loading } = useAuth();
+  const { user, activeRole, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -15,14 +15,23 @@ const ProtectedRoute = ({ children, roles }) => {
   }
 
   if (!user) {
-    // Redirect them to the /login page, but save the current location they were
-    // trying to go to. This allows us to send them along to that page after they
-    // login, which is a nicer user experience than dropping them off on the home page.
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (roles && !roles.includes(user.role)) {
-    // If the user's role is not in the allowed roles, redirect to home/dashboard
+  // If user has multiple roles and no active role is selected, redirect to select-role page
+  // Allow access to the select-role page itself
+  if (user.roles.length > 1 && !activeRole && location.pathname !== '/select-role') {
+    return <Navigate to="/select-role" replace />;
+  }
+
+  // If the user is trying to access the select-role page but has an active role, redirect to dashboard
+  if (location.pathname === '/select-role' && activeRole) {
+      return <Navigate to="/" replace />;
+  }
+
+  // Check if the active role has access to the route
+  if (roles && !roles.includes(activeRole)) {
+    // Redirect to dashboard or an unauthorized page
     return <Navigate to="/" replace />;
   }
 

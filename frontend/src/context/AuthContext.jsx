@@ -6,9 +6,21 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [activeRole, _setActiveRole] = useState(
+    sessionStorage.getItem("activeRole")
+  );
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const setActiveRole = (roleName) => {
+    if (roleName) {
+      sessionStorage.setItem("activeRole", roleName);
+    } else {
+      sessionStorage.removeItem("activeRole");
+    }
+    _setActiveRole(roleName);
+  };
 
   const handleAuth = useCallback(
     async (token) => {
@@ -16,12 +28,23 @@ export const AuthProvider = ({ children }) => {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       try {
         const response = await api.get("/auth/me");
-        setUser(response.data);
+        const userData = response.data;
+        setUser(userData);
+
+        // If user has only one role, automatically set it as active.
+        // Otherwise, clear any previously active role to force selection.
+        if (userData.roles?.length === 1) {
+          setActiveRole(userData.roles[0].name);
+        } else {
+          setActiveRole(null);
+        }
+
         // Redirect to dashboard, removing the token from the URL
         navigate("/", { replace: true });
       } catch (error) {
         console.error("Failed to fetch user:", error);
         localStorage.removeItem("token");
+        setActiveRole(null);
         setUser(null);
       }
     },
@@ -38,12 +61,12 @@ export const AuthProvider = ({ children }) => {
     } else {
       // Check for token from localStorage
       const tokenFromStorage = localStorage.getItem("token");
-      if (tokenFromStorage) {
+      if (tokenFromStorage && !user) {
         handleAuth(tokenFromStorage);
       }
     }
     setLoading(false);
-  }, [handleAuth, location.search]);
+  }, [handleAuth, location.search, user]);
 
   const login = async (identifier, password, rememberMe) => {
     const response = await api.post("/auth/login", {
@@ -51,20 +74,30 @@ export const AuthProvider = ({ children }) => {
       password,
       rememberMe,
     });
-    const { token, ...userData } = response.data;
-    handleAuth(token);
-    setUser(userData); // Set user immediately for faster UI update
+    const { token } = response.data;
+    // handleAuth will fetch user and set roles
+    await handleAuth(token);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
+    setActiveRole(null);
     delete api.defaults.headers.common["Authorization"];
     setUser(null);
     navigate("/login", { replace: true });
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        activeRole,
+        setActiveRole,
+        loading,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

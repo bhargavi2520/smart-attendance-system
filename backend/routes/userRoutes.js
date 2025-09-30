@@ -6,8 +6,7 @@ const {
   updateUser,
   deleteUser,
 } = require("../controllers/userController");
-const { protect } = require("../middleware/authMiddleware");
-const { authorize } = require("../middleware/roleMiddleware");
+const { protect, authorize } = require("../middleware/authMiddleware");
 
 // All routes in this file are protected and restricted to PRINCIPAL role
 router.use(protect, authorize("ADMIN"));
