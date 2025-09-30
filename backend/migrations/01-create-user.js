@@ -18,26 +18,22 @@ module.exports = {
         unique: true,
         allowNull: false,
       },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      googleId: {
+      google_id: {
         type: Sequelize.STRING,
         unique: true,
         allowNull: true,
       },
-      passwordResetToken: {
+      password: {
         type: Sequelize.STRING,
+        allowNull: true,
       },
-      passwordResetExpires: {
-        type: Sequelize.DATE,
-      },
-      createdAt: {
+      password_reset_token: Sequelize.STRING,
+      password_reset_expires: Sequelize.DATE,
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE,
       },
