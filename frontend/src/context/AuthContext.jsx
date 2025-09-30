@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", token);
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       try {
-        const response = await api.get("/auth/me");
+        const response = await api.get("/api/auth/me");
         const userData = response.data;
         setUser(userData);
 
@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
   }, [handleAuth, location.search, user]);
 
   const login = async (identifier, password, rememberMe) => {
-    const response = await api.post("/auth/login", {
+    const response = await api.post("/api/auth/login", {
       identifier,
       password,
       rememberMe,
