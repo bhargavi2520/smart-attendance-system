@@ -1,83 +1,99 @@
+// File: src/pages/dashboards/FacultyDashboard.jsx (Corrected)
+
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import api from "../../services/api";
-import Card from "../../components/ui/Card";
 import Spinner from "../../components/ui/Spinner";
-import { Clock, BookOpen, ChevronRight } from "lucide-react";
+//import Spinner from "../../components/ui/Spinner";
+import ClassSchedule from "../faculty/ClassSchedule";
+import RecentAttendance from "../faculty/RecentAttendance";
+import SubjectSummary from "../faculty/SubjectSummary";
 
 const FacultyDashboard = () => {
-  const [todayClasses, setTodayClasses] = useState([]);
+  const [dashboardData, setDashboardData] = useState({
+    todayClasses: [],
+    recentActions: [],
+    summary: [],
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchClasses = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const response = await api.get("/attendance/faculty/today");
-        setTodayClasses(response.data);
+        // Fetch all data in parallel
+        const [classesRes, recentRes, summaryRes] = await Promise.all([
+          // CORRECTED: Added the missing '/api' prefix to the path
+          api.get("/api/attendance/faculty/today"),
+          api.get("/api/faculty/attendance/recent"),
+          api.get("/api/faculty/attendance/summary"),
+        ]);
+
+        setDashboardData({
+          todayClasses: classesRes.data,
+          recentActions: recentRes.data,
+          summary: summaryRes.data,
+        });
       } catch (err) {
-        setError("Failed to fetch today's classes.");
+        console.error("Failed to fetch dashboard data:", err);
+        setError("Failed to load dashboard. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchClasses();
+    fetchDashboardData();
   }, []);
 
-  if (loading) return <Spinner />;
-  if (error) return <p className="text-red-500">{error}</p>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full pt-20">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <p className="text-red-500 text-center">{error}</p>;
+  }
+
+  const noData =
+    !dashboardData.todayClasses?.length &&
+    !dashboardData.recentActions?.length &&
+    !dashboardData.summary?.length;
+
+  if (noData) {
+    return (
+      <div className="p-6 bg-gray-50 min-h-screen">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+          <p className="text-gray-500">Welcome back, Professor!</p>
+        </header>
+        <div className="text-center py-12">
+          <p className="text-gray-500">
+            No dashboard data available at the moment.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">
-        Today's Classes
-      </h1>
-      {todayClasses.length > 0 ? (
-        <div className="space-y-4">
-          {todayClasses.map((session) => (
-            <Card
-              key={session.id}
-              className="hover:shadow-lg transition-shadow"
-            >
-              <Link to={`/mark-attendance/${session.id}`} className="block">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-lg font-semibold text-indigo-600">
-                      {session.Course.courseName}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {session.Course.courseCode}
-                    </p>
-                    <div className="flex items-center text-sm text-gray-600 mt-2">
-                      <Clock className="w-4 h-4 mr-2" />
-                      <span>
-                        {session.startTime} - {session.endTime}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 text-indigo-500">
-                    <span>Mark Attendance</span>
-                    <ChevronRight className="w-5 h-5" />
-                  </div>
-                </div>
-              </Link>
-            </Card>
-          ))}
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <header className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+        <p className="text-gray-500">Welcome back, Professor!</p>
+      </header>
+
+      <main className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Changed grid layout to be more responsive like the design */}
+        <div className="lg:col-span-2 flex flex-col gap-8">
+          <ClassSchedule classes={dashboardData.todayClasses} />
+          <SubjectSummary summary={dashboardData.summary} />
         </div>
-      ) : (
-        <Card>
-          <div className="text-center py-8">
-            <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
-              No Classes Today
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              You have no scheduled classes for today.
-            </p>
-          </div>
-        </Card>
-      )}
+        <div className="lg:col-span-1">
+          <RecentAttendance actions={dashboardData.recentActions} />
+        </div>
+      </main>
     </div>
   );
 };

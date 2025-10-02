@@ -13,6 +13,7 @@ const authRoutes = require("./routes/authRoutes");
 const attendanceRoutes = require("./routes/attendanceRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const userRoutes = require("./routes/userRoutes");
+const facultyRoutes = require("./routes/facultyRoutes");
 
 const app = express();
 
@@ -65,6 +66,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/faculty", facultyRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to the Smart Attendance System API." });

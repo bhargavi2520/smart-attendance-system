@@ -1,3 +1,5 @@
+// File: src/context/AuthContext.jsx (Final Fix)
+
 import { createContext, useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../services/api";
@@ -31,15 +33,14 @@ export const AuthProvider = ({ children }) => {
         const userData = response.data;
         setUser(userData);
 
-        // If user has only one role, automatically set it as active.
-        // Otherwise, clear any previously active role to force selection.
         if (userData.roles?.length === 1) {
-          setActiveRole(userData.roles[0].name);
+          // --- THIS IS THE FIX ---
+          // Convert the role to lowercase to ensure it always matches.
+          setActiveRole(userData.roles[0].toLowerCase());
         } else {
           setActiveRole(null);
         }
 
-        // Redirect to dashboard, removing the token from the URL
         navigate("/", { replace: true });
       } catch (error) {
         console.error("Failed to fetch user:", error);
@@ -51,21 +52,21 @@ export const AuthProvider = ({ children }) => {
     [navigate]
   );
 
+  // ... the rest of your AuthContext.jsx file remains the same ...
+
   useEffect(() => {
-    // Check for token from Google Redirect in URL
     const params = new URLSearchParams(location.search);
     const tokenFromUrl = params.get("token");
 
-    if (tokenFromUrl) {
-      handleAuth(tokenFromUrl);
-    } else {
-      // Check for token from localStorage
-      const tokenFromStorage = localStorage.getItem("token");
-      if (tokenFromStorage && !user) {
-        handleAuth(tokenFromStorage);
+    const initializeAuth = async () => {
+      const token = tokenFromUrl || localStorage.getItem("token");
+      if (token && !user) {
+        await handleAuth(token);
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+
+    initializeAuth();
   }, [handleAuth, location.search, user]);
 
   const login = async (identifier, password, rememberMe) => {
@@ -75,7 +76,6 @@ export const AuthProvider = ({ children }) => {
       rememberMe,
     });
     const { token } = response.data;
-    // handleAuth will fetch user and set roles
     await handleAuth(token);
   };
 

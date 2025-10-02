@@ -6,6 +6,8 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import MyAttendance from "./pages/student/MyAttendance";
 import MarkAttendance from "./pages/faculty/MarkAttendance";
+import FacultyReportsPage from "./pages/faculty/FacultyReportsPage";
+import FacultySettingsPage from "./pages/faculty/FacultySettingsPage";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -57,6 +59,24 @@ function App() {
           element={
             <ProtectedRoute roles={["faculty"]}>
               <MarkAttendance />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="reports"
+          element={
+            <ProtectedRoute roles={["faculty", "hod", "principal"]}>
+              <FacultyReportsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="settings"
+          element={
+            <ProtectedRoute>
+              {" "}
+              {/* For all roles */}
+              <FacultySettingsPage />
             </ProtectedRoute>
           }
         />
