@@ -22,21 +22,17 @@ module.exports = (sequelize, DataTypes) => {
     {
       studentId: {
         type: DataTypes.INTEGER,
-        field: "studentid",
       },
       courseId: {
         type: DataTypes.INTEGER,
-        field: "courseid",
       },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: "createdat",
       },
       updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: "updatedat",
       },
     },
     {

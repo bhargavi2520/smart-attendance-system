@@ -43,15 +43,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         unique: true,
         allowNull: true,
-        field: "google_id", // <-- explicit mapping
       },
       passwordResetToken: {
         type: DataTypes.STRING,
-        field: "password_reset_token", // <-- explicit mapping
       },
       passwordResetExpires: {
         type: DataTypes.DATE,
-        field: "password_reset_expires", // <-- explicit mapping
       },
     },
     {

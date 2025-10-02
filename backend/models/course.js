@@ -19,25 +19,20 @@ module.exports = (sequelize, DataTypes) => {
     {
       courseName: {
         type: DataTypes.STRING,
-        field: "coursename",
       },
       courseCode: {
         type: DataTypes.STRING,
-        field: "coursecode",
       },
       department: {
         type: DataTypes.STRING,
-        field: "department",
       },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: "createdat",
       },
       updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: "updatedat",
       },
     },
     {

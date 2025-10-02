@@ -20,33 +20,26 @@ module.exports = (sequelize, DataTypes) => {
     {
       studentId: {
         type: DataTypes.INTEGER,
-        field: "studentid",
       },
       timetableId: {
         type: DataTypes.INTEGER,
-        field: "timetableid",
       },
       date: {
         type: DataTypes.DATEONLY,
-        field: "date",
       },
       status: {
         type: DataTypes.ENUM("PRESENT", "ABSENT"),
-        field: "status",
       },
       markedBy: {
         type: DataTypes.INTEGER,
-        field: "markedby",
       },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: "createdat",
       },
       updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: "updatedat",
       },
     },
     {

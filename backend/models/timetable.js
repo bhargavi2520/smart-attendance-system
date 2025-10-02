@@ -20,33 +20,26 @@ module.exports = (sequelize, DataTypes) => {
     {
       courseId: {
         type: DataTypes.INTEGER,
-        field: "courseid",
       },
       facultyId: {
         type: DataTypes.INTEGER,
-        field: "facultyid",
       },
       dayOfWeek: {
         type: DataTypes.STRING,
-        field: "dayofweek",
       },
       startTime: {
         type: DataTypes.TIME,
-        field: "starttime",
       },
       endTime: {
         type: DataTypes.TIME,
-        field: "endtime",
       },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: "createdat",
       },
       updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        field: "updatedat",
       },
     },
     {
