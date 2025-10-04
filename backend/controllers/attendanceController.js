@@ -8,9 +8,15 @@ const StudentCourse = db.StudentCourse;
 
 // FACULTY: Get faculty's classes for the current day
 exports.getFacultyTodayClasses = async (req, res) => {
+  console.log("--- DEBUG: Entering getFacultyTodayClasses ---");
+  console.log("1. req.user object:", req.user);
   try {
     const facultyId = req.user.id;
     const today = new Date().toLocaleString("en-US", { weekday: "long" }); // e.g., "Monday"
+
+    console.log("2. Faculty ID:", facultyId);
+
+    console.log("3. Today's day being queried:", today);
 
     const classes = await Timetable.findAll({
       where: {
@@ -25,8 +31,10 @@ exports.getFacultyTodayClasses = async (req, res) => {
       ],
       order: [["startTime", "ASC"]],
     });
+    console.log("4. Classes found:", classes);
     res.json(classes);
   } catch (error) {
+    console.error("!!! ERROR in getFacultyTodayClasses:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -76,12 +84,10 @@ exports.markAttendance = async (req, res) => {
     });
 
     if (existingAttendance) {
-      return res
-        .status(409)
-        .json({
-          message:
-            "Attendance for this session has already been marked for this date.",
-        });
+      return res.status(409).json({
+        message:
+          "Attendance for this session has already been marked for this date.",
+      });
     }
 
     const records = attendanceData.map((record) => ({

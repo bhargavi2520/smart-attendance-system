@@ -13,7 +13,7 @@ const SelectRole = () => {
   }
 
   const handleRoleSelect = (roleName) => {
-    setActiveRole(roleName);
+    setActiveRole(roleName.toLowerCase());
     navigate("/");
   };
 

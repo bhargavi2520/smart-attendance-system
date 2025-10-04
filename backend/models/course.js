@@ -1,38 +1,31 @@
+// models/course.js
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Course extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      Course.belongsToMany(models.User, {
-        through: models.StudentCourse,
+      // A course can be taught to many classes through the timetable
+      Course.belongsToMany(models.Class, {
+        through: "Timetable",
         foreignKey: "courseId",
+        otherKey: "classId",
+        as: "classes",
       });
+
+      // A course has many scheduled sessions in the timetable
       Course.hasMany(models.Timetable, { foreignKey: "courseId" });
     }
   }
   Course.init(
     {
-      courseName: {
+      name: {
         type: DataTypes.STRING,
-      },
-      courseCode: {
-        type: DataTypes.STRING,
-      },
-      department: {
-        type: DataTypes.STRING,
-      },
-      createdAt: {
-        type: DataTypes.DATE,
         allowNull: false,
       },
-      updatedAt: {
-        type: DataTypes.DATE,
+      code: {
+        type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
       },
     },
     {

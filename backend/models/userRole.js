@@ -5,7 +5,6 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class UserRole extends Model {
     static associate(models) {
-      // You can define associations here if needed, for example:
       UserRole.belongsTo(models.User, { foreignKey: "userId" });
       UserRole.belongsTo(models.Role, { foreignKey: "roleId" });
     }
@@ -15,19 +14,13 @@ module.exports = (sequelize, DataTypes) => {
     {
       userId: {
         type: DataTypes.INTEGER,
-        references: {
-          model: "users",
-          key: "id",
-        },
         primaryKey: true,
+        references: { model: "users", key: "id" },
       },
       roleId: {
         type: DataTypes.INTEGER,
-        references: {
-          model: "roles",
-          key: "id",
-        },
         primaryKey: true,
+        references: { model: "roles", key: "id" },
       },
     },
     {

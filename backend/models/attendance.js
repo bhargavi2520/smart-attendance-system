@@ -1,14 +1,13 @@
+// models/attendance.js
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Attendance extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      Attendance.belongsTo(models.User, { foreignKey: "studentId" });
+      Attendance.belongsTo(models.User, {
+        foreignKey: "studentId",
+        as: "student",
+      });
       Attendance.belongsTo(models.Timetable, { foreignKey: "timetableId" });
       Attendance.belongsTo(models.User, {
         foreignKey: "markedBy",
@@ -20,26 +19,21 @@ module.exports = (sequelize, DataTypes) => {
     {
       studentId: {
         type: DataTypes.INTEGER,
+        references: { model: "users", key: "id" },
       },
       timetableId: {
         type: DataTypes.INTEGER,
+        references: { model: "timetables", key: "id" },
       },
       date: {
         type: DataTypes.DATEONLY,
       },
       status: {
-        type: DataTypes.ENUM("PRESENT", "ABSENT"),
+        type: DataTypes.ENUM("PRESENT", "ABSENT", "LATE"),
       },
       markedBy: {
         type: DataTypes.INTEGER,
-      },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
+        references: { model: "users", key: "id" },
       },
     },
     {

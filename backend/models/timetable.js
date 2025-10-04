@@ -1,14 +1,11 @@
+// models/timetable.js
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Timetable extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
       Timetable.belongsTo(models.Course, { foreignKey: "courseId" });
+      Timetable.belongsTo(models.Class, { foreignKey: "classId" });
       Timetable.belongsTo(models.User, {
         foreignKey: "facultyId",
         as: "faculty",
@@ -20,9 +17,15 @@ module.exports = (sequelize, DataTypes) => {
     {
       courseId: {
         type: DataTypes.INTEGER,
+        references: { model: "courses", key: "id" },
+      },
+      classId: {
+        type: DataTypes.INTEGER,
+        references: { model: "classes", key: "id" },
       },
       facultyId: {
         type: DataTypes.INTEGER,
+        references: { model: "users", key: "id" },
       },
       dayOfWeek: {
         type: DataTypes.STRING,
@@ -33,13 +36,8 @@ module.exports = (sequelize, DataTypes) => {
       endTime: {
         type: DataTypes.TIME,
       },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
+      semester: {
+        type: DataTypes.INTEGER,
       },
     },
     {

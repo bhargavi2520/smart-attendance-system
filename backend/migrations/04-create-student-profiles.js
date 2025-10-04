@@ -1,34 +1,34 @@
+// migrations/04-create-student-profiles.js
 "use strict";
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("users", {
+    await queryInterface.createTable("student_profiles", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      name: {
-        type: Sequelize.STRING,
+      user_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        unique: true,
+        references: { model: "users", key: "id" },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
       },
-      email: {
+      roll_number: {
         type: Sequelize.STRING,
         unique: true,
         allowNull: false,
       },
-      google_id: {
-        type: Sequelize.STRING,
-        unique: true,
+      class_id: {
+        type: Sequelize.INTEGER,
         allowNull: true,
+        references: { model: "classes", key: "id" },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
       },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      password_reset_token: Sequelize.STRING,
-      password_reset_expires: Sequelize.DATE,
       created_at: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -40,6 +40,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("users");
+    await queryInterface.dropTable("student_profiles");
   },
 };

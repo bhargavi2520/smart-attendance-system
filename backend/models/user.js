@@ -6,16 +6,19 @@ const bcrypt = require("bcryptjs");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
+      // A user can have one student profile (if they are a student)
       User.hasOne(models.StudentProfile, {
         foreignKey: "userId",
         as: "studentProfile",
       });
 
+      // A user can have one faculty profile (if they are faculty)
       User.hasOne(models.FacultyProfile, {
         foreignKey: "userId",
         as: "facultyProfile",
       });
 
+      // A user can have multiple roles (e.g., HOD and Faculty)
       User.belongsToMany(models.Role, {
         through: "UserRole",
         foreignKey: "userId",
