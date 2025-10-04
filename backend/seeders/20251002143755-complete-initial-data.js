@@ -312,7 +312,86 @@ module.exports = {
       }
     });
 
-    // C. Generate 15 Students for each Class
+    // C. Generate 15 Students for each Class with Realistic Names
+    const studentNames = [
+      "Aarav Sharma",
+      "Vivaan Singh",
+      "Aditya Kumar",
+      "Vihaan Gupta",
+      "Arjun Patel",
+      "Sai Reddy",
+      "Reyansh Mishra",
+      "Krishna Verma",
+      "Ishaan Yadav",
+      "Ayaan Khan",
+      "Advik Jain",
+      "Kabir Shah",
+      "Ansh Tiwari",
+      "Dhruv Dubey",
+      "Aadi Joshi",
+      "Diya Mehta",
+      "Saanvi Agarwal",
+      "Aanya Sharma",
+      "Myra Singh",
+      "Aarohi Patel",
+      "Anika Reddy",
+      "Navya Gupta",
+      "Siya Verma",
+      "Pari Mishra",
+      "Riya Khan",
+      "Anvi Jain",
+      "Ira Shah",
+      "Sia Tiwari",
+      "Kiara Dubey",
+      "Amaira Joshi",
+      "Liam Smith",
+      "Olivia Johnson",
+      "Noah Williams",
+      "Emma Brown",
+      "Oliver Jones",
+      "Ava Garcia",
+      "Elijah Miller",
+      "Charlotte Davis",
+      "William Rodriguez",
+      "Sophia Martinez",
+      "James Hernandez",
+      "Amelia Lopez",
+      "Benjamin Gonzalez",
+      "Mia Wilson",
+      "Lucas Anderson",
+      "Isabella Taylor",
+      "Henry Thomas",
+      "Evelyn Moore",
+      "Alexander Jackson",
+      "Harper Martin",
+      "Sebastian Lee",
+      "Camila Perez",
+      "Jack Thompson",
+      "Abigail White",
+      "Owen Harris",
+      "Emily Sanchez",
+      "Theodore Clark",
+      "Ella Lewis",
+      "Samuel Robinson",
+      "Avery Walker",
+      "Daniel Young",
+      "Sofia Allen",
+      "Matthew King",
+      "Aria Wright",
+      "Joseph Scott",
+      "Luna Green",
+      "David Baker",
+      "Chloe Adams",
+      "Leo Nelson",
+      "Grace Carter",
+      "Ryan Mitchell",
+      "Riley Perez",
+      "Luke Roberts",
+      "Zoey Turner",
+      "John Phillips",
+    ];
+    let nameIndex = 0;
+
     classesData.forEach((classInfo) => {
       for (let i = 1; i <= 15; i++) {
         const studentId = userIdCounter++;
@@ -321,9 +400,12 @@ module.exports = {
           .toUpperCase()}${classInfo.year - 2023}0${classInfo.id}${String(
           i
         ).padStart(2, "0")}`;
+
+        const studentName = studentNames[nameIndex++] || `Student ${studentId}`; // Fallback name
+
         users.push({
           id: studentId,
-          name: `${classInfo.department} Student ${i}`,
+          name: studentName,
           email: `student.${rollNumber.toLowerCase()}@test.com`,
           password: hashedPassword,
           created_at: now,

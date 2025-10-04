@@ -1,37 +1,35 @@
+// controllers/attendanceController.js
 const db = require("../models");
-const { Op } = require("sequelize");
-const User = db.User;
-const Course = db.Course;
-const Attendance = db.Attendance;
-const Timetable = db.Timetable;
-const StudentCourse = db.StudentCourse;
 
-// FACULTY: Get faculty's classes for the current day
 exports.getFacultyTodayClasses = async (req, res) => {
-  console.log("--- DEBUG: Entering getFacultyTodayClasses ---");
-  console.log("1. req.user object:", req.user);
   try {
     const facultyId = req.user.id;
-    const today = new Date().toLocaleString("en-US", { weekday: "long" }); // e.g., "Monday"
+    // Get the current day in the full string format (e.g., "Saturday")
+    const today = new Date().toLocaleString("en-US", { weekday: "long" });
 
-    console.log("2. Faculty ID:", facultyId);
-
-    console.log("3. Today's day being queried:", today);
-
-    const classes = await Timetable.findAll({
+    const classes = await db.Timetable.findAll({
       where: {
-        facultyId: facultyId,
-        dayOfWeek: today,
+        faculty_id: facultyId,
+        day_of_week: today,
       },
       include: [
         {
-          model: Course,
-          attributes: ["courseName", "courseCode"],
+          model: db.Course,
+          // --- FIX: ---
+          // 1. Select the correct columns 'name' and 'code'.
+          // 2. Alias them as 'courseName' and 'courseCode' so the frontend receives the expected format.
+          attributes: [
+            ["name", "courseName"],
+            ["code", "courseCode"],
+          ],
+        },
+        {
+          model: db.Class,
+          attributes: ["name", "department"],
         },
       ],
-      order: [["startTime", "ASC"]],
+      order: [["start_time", "ASC"]],
     });
-    console.log("4. Classes found:", classes);
     res.json(classes);
   } catch (error) {
     console.error("!!! ERROR in getFacultyTodayClasses:", error);
@@ -39,46 +37,50 @@ exports.getFacultyTodayClasses = async (req, res) => {
   }
 };
 
-// FACULTY: Get student list for a specific class session to mark attendance
+// ... (rest of the controller file remains the same)
+
 exports.getStudentsForSession = async (req, res) => {
   try {
     const { timetableId } = req.params;
-    const timetableEntry = await Timetable.findByPk(timetableId);
+    const timetableEntry = await db.Timetable.findByPk(timetableId, {
+      include: [db.Course, db.Class],
+    });
+
     if (!timetableEntry) {
       return res.status(404).json({ message: "Class session not found." });
     }
 
-    const enrolledStudents = await StudentCourse.findAll({
-      where: { courseId: timetableEntry.courseId },
+    // Find the student profiles linked to this specific class
+    const studentProfiles = await db.StudentProfile.findAll({
+      where: { class_id: timetableEntry.class_id },
       include: [
         {
-          model: User,
-          as: "student",
+          model: db.User,
+          as: "user",
           attributes: ["id", "name", "email"],
         },
       ],
     });
 
-    const students = enrolledStudents.map((sc) => sc.student);
+    const students = studentProfiles.map((p) => p.user);
 
     res.json({
       timetable: timetableEntry,
       students: students,
     });
   } catch (error) {
+    console.error("!!! ERROR in getStudentsForSession:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
-// FACULTY: Mark attendance for a session
 exports.markAttendance = async (req, res) => {
-  const { timetableId, date, attendanceData } = req.body; // attendanceData is an array of { studentId, status }
+  const { timetableId, date, attendanceData } = req.body;
   const t = await db.sequelize.transaction();
   try {
-    // Check if attendance for this session on this date has already been marked
-    const existingAttendance = await Attendance.findOne({
+    const existingAttendance = await db.Attendance.findOne({
       where: {
-        timetableId,
+        timetable_id: timetableId,
         date,
       },
     });
@@ -91,115 +93,19 @@ exports.markAttendance = async (req, res) => {
     }
 
     const records = attendanceData.map((record) => ({
-      ...record,
-      timetableId,
+      student_id: record.studentId,
+      status: record.status,
+      timetable_id: timetableId,
       date,
-      markedBy: req.user.id,
+      marked_by: req.user.id,
     }));
 
-    await Attendance.bulkCreate(records, { transaction: t });
+    await db.Attendance.bulkCreate(records, { transaction: t });
     await t.commit();
     res.status(201).json({ message: "Attendance marked successfully." });
   } catch (error) {
     await t.rollback();
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
-
-// STUDENT: Get a student's own attendance records
-exports.getStudentAttendance = async (req, res) => {
-  try {
-    const studentId = req.user.id;
-    const studentCourses = await StudentCourse.findAll({
-      where: { studentId },
-    });
-    const courseIds = studentCourses.map((sc) => sc.courseId);
-
-    const attendanceSummary = await Course.findAll({
-      where: { id: courseIds },
-      attributes: ["id", "courseName", "courseCode"],
-      include: [
-        {
-          model: Timetable,
-          attributes: [],
-          required: true,
-          include: [
-            {
-              model: Attendance,
-              where: { studentId },
-              attributes: [],
-              required: true, // Use inner join to only get courses with attendance marked
-            },
-          ],
-        },
-      ],
-      group: ["Course.id"],
-      // Use subqueries or raw queries if this gets too complex for ORM
-      attributes: [
-        "id",
-        "courseName",
-        "courseCode",
-        [
-          db.sequelize.fn(
-            "COUNT",
-            db.sequelize.col("Timetables.Attendances.id")
-          ),
-          "totalClasses",
-        ],
-        [
-          db.sequelize.fn(
-            "SUM",
-            db.sequelize.literal(
-              `CASE WHEN "Timetables->Attendances"."status" = 'PRESENT' THEN 1 ELSE 0 END`
-            )
-          ),
-          "attendedClasses",
-        ],
-      ],
-    });
-
-    const formattedSummary = attendanceSummary.map((course) => {
-      const total = parseInt(course.get("totalClasses"));
-      const attended = parseInt(course.get("attendedClasses"));
-      return {
-        courseName: course.courseName,
-        courseCode: course.courseCode,
-        totalClasses: total,
-        attendedClasses: attended,
-        percentage: total > 0 ? (attended / total) * 100 : 0,
-      };
-    });
-
-    res.json(formattedSummary);
-  } catch (error) {
-    console.error("Error fetching student attendance:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
-
-// Get detailed attendance for a student in a specific course
-exports.getStudentDetailedAttendance = async (req, res) => {
-  try {
-    const studentId = req.user.id;
-    const { courseId } = req.params;
-
-    const records = await Attendance.findAll({
-      where: {
-        studentId,
-      },
-      include: {
-        model: Timetable,
-        where: { courseId },
-        attributes: ["dayOfWeek", "startTime"],
-        include: {
-          model: Course,
-          attributes: ["courseName"],
-        },
-      },
-      order: [["date", "DESC"]],
-    });
-    res.json(records);
-  } catch (error) {
+    console.error("!!! ERROR in markAttendance:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
