@@ -26,27 +26,32 @@ export const AuthProvider = ({ children }) => {
 
   const handleAuth = useCallback(
     async (token) => {
+      setActiveRole(null);
       localStorage.setItem("token", token);
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       try {
         const response = await api.get("/api/auth/me");
-        const userData = response.data;
+        const { user: userData } = response.data;
+
         setUser(userData);
 
-        if (userData.roles?.length === 1) {
-          // --- THIS IS THE FIX ---
-          // Convert the role to lowercase to ensure it always matches.
-          setActiveRole(userData.roles[0].toLowerCase());
+        // This new logic navigates only ONCE to the correct page
+        if (userData.roles?.length > 1) {
+          // If more than one role, go to the selection page.
+          navigate("/select-role", { replace: true });
         } else {
-          setActiveRole(null);
+          // Otherwise, set the single role and go to the dashboard.
+          if (userData.roles?.length === 1) {
+            setActiveRole(userData.roles[0]);
+          }
+          navigate("/", { replace: true });
         }
-
-        navigate("/", { replace: true });
       } catch (error) {
         console.error("Failed to fetch user:", error);
         localStorage.removeItem("token");
         setActiveRole(null);
         setUser(null);
+        navigate("/login", { replace: true });
       }
     },
     [navigate]

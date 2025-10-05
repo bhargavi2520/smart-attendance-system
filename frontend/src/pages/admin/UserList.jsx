@@ -14,10 +14,14 @@ export default function UserList() {
     const fetchUsers = async () => {
       if (user) {
         try {
-          const { data } = await api.get("/users");
-          setUsers(data);
+          // 1. Fixed the address to start with "/api"
+          const { data } = await api.get("/api/users");
+
+          // 2. Used the correct "data" variable
+          setUsers(data.users || []);
         } catch (err) {
           setError("Failed to fetch users.");
+          console.error("Error details:", err); // Logs the actual error to the console
         } finally {
           setLoading(false);
         }

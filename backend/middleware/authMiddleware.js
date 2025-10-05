@@ -29,13 +29,17 @@ const authorize = (...allowedRoles) => {
     }
 
     const userRoles = req.user.roles;
+    const cleanedAllowedRoles = allowedRoles.map((role) => role.trim());
+
     const hasPermission = userRoles.some((role) =>
-      allowedRoles.includes(role)
+      cleanedAllowedRoles.includes(role.trim())
     );
 
     if (!hasPermission) {
       return res.status(403).json({
-        message: `Forbidden: You need one of the following roles: ${allowedRoles.join(", ")}`,
+        message: `Forbidden: You need one of the following roles: ${allowedRoles.join(
+          ", "
+        )}`,
       });
     }
 

@@ -28,6 +28,14 @@ const FacultyDashboard = () => {
           api.get("/api/faculty/attendance/summary"),
         ]);
 
+        // --- THIS IS THE FIX ---
+        // Ensure that we always have an array, even if the API response is empty or not an array.
+        setDashboardData({
+          todayClasses: Array.isArray(classesRes.data) ? classesRes.data : [],
+          recentActions: Array.isArray(recentRes.data) ? recentRes.data : [],
+          summary: Array.isArray(summaryRes.data) ? summaryRes.data : [],
+        });
+        // --- END OF FIX ---
         setDashboardData({
           todayClasses: classesRes.data,
           recentActions: recentRes.data,

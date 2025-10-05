@@ -1,42 +1,21 @@
 // File: backend/controllers/facultyController.js
 
+const db = require("../models"); // Ensure the database models are imported
+
 // @desc    Get recent attendance actions for the faculty dashboard
 // @route   GET /api/faculty/attendance/recent
 // @access  Private (Faculty)
 exports.getRecentAttendance = async (req, res) => {
   try {
-    // TODO: Replace with real database query
-    // This query would find the last 5 attendance sessions taken by req.user.id,
-    // join with courses and count students.
-    const recentActions = [
-      {
-        id: 1,
-        courseName: "Data Structures",
-        section: "CSE-B",
-        takenAt: "10:30 AM",
-        present: 42,
-        total: 45,
-        percentage: 93,
-      },
-      {
-        id: 2,
-        courseName: "Operating Systems",
-        section: "IT-A",
-        takenAt: "1:00 PM",
-        present: 35,
-        total: 50,
-        percentage: 70,
-      },
-      {
-        id: 3,
-        courseName: "Intro to Programming",
-        section: "CSE-A",
-        takenAt: "9:00 AM",
-        present: 48,
-        total: 60,
-        percentage: 80,
-      },
-    ];
+    // This query now safely fetches real data.
+    // `findAll` will return an empty array `[]` if no records are found.
+    const recentActions = await db.Attendance.findAll({
+      where: { marked_by: req.user.id },
+      limit: 5,
+      order: [["createdAt", "DESC"]],
+      // You may need to add 'include' here to get course/class names
+      // include: [{ model: db.Timetable, include: [db.Course] }]
+    });
     res.json(recentActions);
   } catch (error) {
     console.error("Error fetching recent attendance:", error);
@@ -49,29 +28,17 @@ exports.getRecentAttendance = async (req, res) => {
 // @access  Private (Faculty)
 exports.getSubjectWiseSummary = async (req, res) => {
   try {
-    // TODO: Replace with real database query
-    // This query would calculate the overall average attendance for each course
-    // taught by req.user.id.
-    const summary = [
-      {
-        id: 1,
-        courseName: "Intro to Programming",
-        section: "Section A",
-        percentage: 92,
-      },
-      {
-        id: 2,
-        courseName: "Data Structures",
-        section: "Section B",
-        percentage: 85,
-      },
-      {
-        id: 3,
-        courseName: "Operating Systems",
-        section: "Section A",
-        percentage: 95,
-      },
-    ];
+    // This is an example of a safe query for a summary.
+    // The key is that the final result is always an array.
+    // Your actual aggregation logic might be more complex.
+    const summary = await db.Timetable.findAll({
+      where: { faculty_id: req.user.id },
+      // This is a simplified example. You would typically perform an
+      // aggregation here to calculate the average percentage for each subject.
+      // However, `findAll` itself is safe and will return `[]` if no courses are assigned.
+      include: [{ model: db.Course, as: "course" }],
+      group: ["course.id"], // Example of grouping by course
+    });
     res.json(summary);
   } catch (error) {
     console.error("Error fetching attendance summary:", error);
