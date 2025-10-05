@@ -9,7 +9,7 @@ const {
 const { protect, authorize } = require("../middleware/authMiddleware");
 
 // All routes in this file are protected and restricted to PRINCIPAL role
-router.use(protect, authorize("admin", "principal"));
+router.use(protect, authorize("ADMIN", "PRINCIPAL"));
 
 router.route("/").get(getAllUsers).post(createUser);
 

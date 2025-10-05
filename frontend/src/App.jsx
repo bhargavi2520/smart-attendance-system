@@ -8,6 +8,7 @@ import MyAttendance from "./pages/student/MyAttendance";
 import MarkAttendance from "./pages/faculty/MarkAttendance";
 import FacultyReportsPage from "./pages/faculty/FacultyReportsPage";
 import FacultySettingsPage from "./pages/faculty/FacultySettingsPage";
+import AttendancePage from "./pages/faculty/AttendancePage";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -54,6 +55,16 @@ function App() {
         />
 
         {/* Faculty Routes */}
+
+        <Route
+          path="attendance"
+          element={
+            <ProtectedRoute roles={["faculty", "hod", "principal"]}>
+              <AttendancePage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="mark-attendance/:timetableId"
           element={

@@ -225,6 +225,9 @@ module.exports = {
     userRoles.push(
       { user_id: 1, role_id: 2, created_at: now, updated_at: now }, // Principal
       { user_id: 2, role_id: 1, created_at: now, updated_at: now }, // Admin
+      { user_id: 1001, role_id: 1, created_at: now, updated_at: now },
+      { user_id: 1001, role_id: 2, created_at: now, updated_at: now },
+      { user_id: 1001, role_id: 3, created_at: now, updated_at: now },
       { user_id: 1001, role_id: 4, created_at: now, updated_at: now },
       { user_id: 1001, role_id: 5, created_at: now, updated_at: now },
       { user_id: 1002, role_id: 1, created_at: now, updated_at: now },
@@ -440,7 +443,7 @@ module.exports = {
         id: 1,
         course_id: 1,
         class_id: 1,
-        faculty_id: facultyMap["Computer Science"][0],
+        faculty_id: 1002,
         semester: 1,
         day_of_week: "Monday",
         start_time: "09:00",

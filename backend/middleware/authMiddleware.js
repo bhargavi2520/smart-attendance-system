@@ -28,11 +28,14 @@ const authorize = (...allowedRoles) => {
       return res.status(403).json({ message: "Forbidden: No roles found" });
     }
 
-    const userRoles = req.user.roles;
-    const cleanedAllowedRoles = allowedRoles.map((role) => role.trim());
+    // Convert the roles required by the route to uppercase
+    const upperCaseAllowedRoles = allowedRoles.map((role) =>
+      role.toUpperCase()
+    );
 
-    const hasPermission = userRoles.some((role) =>
-      cleanedAllowedRoles.includes(role.trim())
+    // Check if the user has permission, ignoring case by converting their roles to uppercase too
+    const hasPermission = req.user.roles.some((role) =>
+      upperCaseAllowedRoles.includes(role.trim().toUpperCase())
     );
 
     if (!hasPermission) {
@@ -46,5 +49,4 @@ const authorize = (...allowedRoles) => {
     next();
   };
 };
-
 module.exports = { protect, authorize };

@@ -4,13 +4,19 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Timetable extends Model {
     static associate(models) {
-      Timetable.belongsTo(models.Course, { foreignKey: "courseId" });
-      Timetable.belongsTo(models.Class, { foreignKey: "classId" });
+      Timetable.belongsTo(models.Course, {
+        foreignKey: "courseId",
+        as: "course",
+      });
+      Timetable.belongsTo(models.Class, { foreignKey: "classId", as: "class" });
       Timetable.belongsTo(models.User, {
         foreignKey: "facultyId",
         as: "faculty",
       });
-      Timetable.hasMany(models.Attendance, { foreignKey: "timetableId" });
+      Timetable.hasMany(models.Attendance, {
+        foreignKey: "timetableId",
+        as: "Attendances", // Add this line
+      });
     }
   }
   Timetable.init(
