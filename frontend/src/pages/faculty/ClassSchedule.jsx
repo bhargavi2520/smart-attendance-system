@@ -26,10 +26,10 @@ const ClassSchedule = ({ classes }) => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-lg font-semibold text-indigo-600">
-                    {session.Course.courseName}
+                    {session.Course?.courseName}
                   </p>
                   <p className="text-sm text-gray-500">
-                    {session.Course.courseCode}
+                    {session.Course?.courseCode}
                   </p>
                   <div className="flex items-center text-sm text-gray-600 mt-2">
                     <Clock className="w-4 h-4 mr-2" />

@@ -22,7 +22,14 @@ exports.getFacultyTodayClasses = async (req, res) => {
         {
           model: db.Class,
           as: "class",
-          attributes: ["name", "department"],
+          attributes: ["name", "year"], // Select attributes directly from the Class table
+          include: [
+            {
+              model: db.Department,
+              as: "department", // Use the association alias
+              attributes: ["name"], // Select the 'name' from the Department table
+            },
+          ],
         },
       ],
       order: [["start_time", "ASC"]],
@@ -36,14 +43,19 @@ exports.getFacultyTodayClasses = async (req, res) => {
 
 exports.getStudentsForSession = async (req, res) => {
   try {
-    const { timetableId } = req.params;
+    // const { timetableId } = req.params;
+    const timetableId = parseInt(req.params.timetableId, 10);
+    if (isNaN(timetableId)) {
+      return res.status(400).json({ message: "Invalid timetable ID." });
+    }
+
     const timetableEntry = await db.Timetable.findByPk(timetableId);
     if (!timetableEntry) {
       return res.status(404).json({ message: "Class session not found." });
     }
 
     const studentProfiles = await db.StudentProfile.findAll({
-      where: { class_id: timetableEntry.class_id },
+      where: { class_id: timetableEntry.classId },
       include: [
         { model: db.User, as: "user", attributes: ["id", "name", "email"] },
       ],

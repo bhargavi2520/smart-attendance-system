@@ -73,6 +73,14 @@ exports.getMyClasses = async (req, res) => {
   try {
     const myClasses = await db.Timetable.findAll({
       where: { facultyId: req.user.id },
+      attributes: [
+        "id",
+        "dayOfWeek",
+        "startTime",
+        "courseId",
+        "classId",
+        "facultyId",
+      ],
       include: [
         { model: db.Course, as: "course", attributes: ["name"] },
         { model: db.Class, as: "class", attributes: ["name"] },

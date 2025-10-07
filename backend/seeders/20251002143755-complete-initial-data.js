@@ -260,7 +260,7 @@ module.exports = {
     const classes = [];
     const facultyMapByDept = {};
     let userIdCounter = 1;
-    let classIdCounter = 1;
+    let classIdCounter = 1; // Counter for Class IDs
     let nameIndex = 0;
 
     // Static Users
@@ -301,15 +301,15 @@ module.exports = {
     facultyProfiles.push(
       {
         user_id: 1001,
-        department_id: departmentMap.General,
-        designation: "Faculty",
+        department_id: departmentMap.CSE,
+        designation: "Professor",
         created_at: now,
         updated_at: now,
       },
       {
         user_id: 1002,
-        department_id: departmentMap.Administration,
-        designation: "Principal",
+        department_id: departmentMap.ECE,
+        designation: "Professor",
         created_at: now,
         updated_at: now,
       },
@@ -329,14 +329,8 @@ module.exports = {
       }
     );
     userRoles.push(
-      ...[1001, 1002].flatMap((id) =>
-        [1, 2, 3, 4, 5].map((r) => ({
-          user_id: id,
-          role_id: r,
-          created_at: now,
-          updated_at: now,
-        }))
-      ),
+      { user_id: 1001, role_id: 5, created_at: now, updated_at: now },
+      { user_id: 1002, role_id: 5, created_at: now, updated_at: now },
       { user_id: 1, role_id: 2, created_at: now, updated_at: now },
       { user_id: 2, role_id: 1, created_at: now, updated_at: now }
     );
@@ -393,6 +387,9 @@ module.exports = {
         });
         facultyMapByDept[dept.id].push(facultyId);
       }
+      // Add test users to faculty map
+      if (dept.name === "CSE") facultyMapByDept[dept.id].push(1001);
+      if (dept.name === "ECE") facultyMapByDept[dept.id].push(1002);
 
       for (let i = 1; i <= 2; i++) {
         // 2 Classes per department
@@ -418,7 +415,7 @@ module.exports = {
           { user_id: inchargeId, role_id: 5, created_at: now, updated_at: now }
         );
 
-        const classId = classIdCounter++;
+        const classId = classIdCounter++; // Use counter for robustness
         classes.push({
           id: classId,
           name: className,
@@ -470,43 +467,102 @@ module.exports = {
     // -- 3. TIMETABLES --
     const timetables = [];
     const timeSlots = [
-      ["09:00", "10:00"],
-      ["10:00", "11:00"],
-      ["11:00", "12:00"],
-      ["13:00", "14:00"],
-      ["14:00", "15:00"],
-      ["15:00", "16:00"],
+      ["09:00:00", "10:00:00"],
+      ["10:00:00", "11:00:00"],
+      ["11:00:00", "12:00:00"],
+      ["13:00:00", "14:00:00"],
+      ["14:00:00", "15:00:00"],
+      ["15:00:00", "16:00:00"],
     ];
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
+    // --- START: MODIFIED TIMETABLE GENERATION LOGIC ---
     for (const cls of classes) {
       const deptCourses = courses.filter(
         (c) => c.department_id === cls.department_id
       );
       const facultyPool = facultyMapByDept[cls.department_id];
+
+      if (deptCourses.length === 0 || facultyPool.length === 0) {
+        continue; // Skip if no courses or faculty for the department
+      }
+
       let courseIndex = 0;
+      let facultyIndex = 0;
 
-      for (let i = 0; i < 6; i++) {
-        // 6 courses per class
-        const course = deptCourses[courseIndex % deptCourses.length];
-        const day = days[i % days.length];
-        const slot = timeSlots[i % timeSlots.length];
+      // Loop through each day of the week
+      for (const day of days) {
+        // Loop through each time slot for the day
+        for (const slot of timeSlots) {
+          const course = deptCourses[courseIndex % deptCourses.length];
+          const faculty = facultyPool[facultyIndex % facultyPool.length];
 
-        timetables.push({
-          course_id: course.id,
-          class_id: cls.id,
-          faculty_id: facultyPool[i % facultyPool.length],
-          semester: 1,
-          day_of_week: day,
-          start_time: slot[0],
-          end_time: slot[1],
-          created_at: now,
-          updated_at: now,
-        });
-        courseIndex++;
+          timetables.push({
+            course_id: course.id,
+            class_id: cls.id,
+            faculty_id: faculty,
+            semester: 1,
+            day_of_week: day,
+            start_time: slot[0],
+            end_time: slot[1],
+            created_at: now,
+            updated_at: now,
+          });
+
+          // Increment to cycle through courses and faculty
+          courseIndex++;
+          facultyIndex++;
+        }
       }
     }
+    // --- END: MODIFIED TIMETABLE GENERATION LOGIC ---
+
     await queryInterface.bulkInsert("timetables", timetables);
+
+    // -- 4. ATTENDANCE DATA FOR TESTING --
+    const testTimetables = await queryInterface.sequelize.query(
+      `SELECT tt.id, tt.class_id, tt.faculty_id FROM timetables tt JOIN users u ON tt.faculty_id = u.id WHERE u.email IN ('saikiransandeep1@gmail.com', 'bhargavi5052@gmail.com')`,
+      { type: Sequelize.QueryTypes.SELECT }
+    );
+
+    const attendanceRecords = [];
+    for (const entry of testTimetables) {
+      const students = await queryInterface.sequelize.query(
+        `SELECT user_id FROM student_profiles WHERE class_id = ${entry.class_id}`,
+        { type: Sequelize.QueryTypes.SELECT }
+      );
+
+      if (students.length === 0) continue;
+
+      // Create attendance for two days ago
+      const date1 = new Date();
+      date1.setDate(date1.getDate() - 2);
+
+      // Create attendance for yesterday
+      const date2 = new Date();
+      date2.setDate(date2.getDate() - 1);
+
+      for (const date of [date1, date2]) {
+        for (let i = 0; i < 5; i++) {
+          // Mark for first 5 students
+          if (students[i]) {
+            attendanceRecords.push({
+              student_id: students[i].user_id,
+              timetable_id: entry.id,
+              status: i % 2 === 0 ? "PRESENT" : "ABSENT", // Alternate status
+              date: date.toISOString().split("T")[0],
+              marked_by: entry.faculty_id,
+              created_at: now,
+              updated_at: now,
+            });
+          }
+        }
+      }
+    }
+
+    if (attendanceRecords.length > 0) {
+      await queryInterface.bulkInsert("attendances", attendanceRecords);
+    }
   },
 
   down: async (queryInterface, Sequelize) => {

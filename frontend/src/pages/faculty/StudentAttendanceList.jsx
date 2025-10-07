@@ -1,4 +1,4 @@
-// src/components/faculty/StudentAttendanceList.jsx
+// src/pages/faculty/StudentAttendanceList.jsx
 
 import React from "react";
 
@@ -13,7 +13,7 @@ const StudentAttendanceList = ({ students, attendance, setAttendance }) => {
   if (students.length === 0) {
     return (
       <p className="text-center text-gray-500 py-8">
-        Select a class to see the student list.
+        Select a class to see the student list or no students are enrolled.
       </p>
     );
   }
@@ -29,7 +29,7 @@ const StudentAttendanceList = ({ students, attendance, setAttendance }) => {
             Student Name
           </th>
           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Roll Number
+            Email
           </th>
           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
             Status
@@ -38,19 +38,19 @@ const StudentAttendanceList = ({ students, attendance, setAttendance }) => {
       </thead>
       <tbody className="bg-white divide-y divide-gray-200">
         {students.map((student) => (
-          <tr key={student.user_id}>
+          <tr key={student.id}>
             <td className="px-6 py-4 whitespace-nowrap">
               <img
                 className="h-10 w-10 rounded-full"
-                src={`https://i.pravatar.cc/150?u=${student.user_id}`}
+                src={`https://i.pravatar.cc/150?u=${student.id}`}
                 alt=""
               />
             </td>
             <td className="px-6 py-4 whitespace-nowrap font-medium">
-              {student.user.name}
+              {student.name}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-              {student.roll_number}
+              {student.email}
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
               <div className="flex items-center space-x-2">
@@ -60,14 +60,12 @@ const StudentAttendanceList = ({ students, attendance, setAttendance }) => {
                     A: { text: "Absent", color: "red" },
                     OD: { text: "On Duty", color: "yellow" },
                   };
-                  const isActive = attendance[student.user_id] === status;
+                  const isActive = attendance[student.id] === status;
                   return (
                     <button
                       key={status}
                       type="button"
-                      onClick={() =>
-                        handleStatusChange(student.user_id, status)
-                      }
+                      onClick={() => handleStatusChange(student.id, status)}
                       className={`px-2 py-1 text-xs font-semibold rounded-full border-2 ${
                         isActive
                           ? `bg-${statusMap[status].color}-500 border-${statusMap[status].color}-500 text-white`

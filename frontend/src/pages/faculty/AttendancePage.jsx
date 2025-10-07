@@ -21,6 +21,7 @@ const AttendancePage = () => {
     const fetchMyClasses = async () => {
       try {
         const response = await api.get("/api/faculty/my-classes");
+        console.log("--- DATA FOR DROPDOWN ---", response.data);
         setAllMyClasses(response.data);
       } catch (err) {
         setError(
@@ -45,10 +46,16 @@ const AttendancePage = () => {
     const fetchStudents = async () => {
       setStudentsLoading(true);
       setError(""); // Clear previous errors
+
       try {
+        console.log(
+          "ATTEMPTING TO FETCH STUDENTS FOR ID:",
+          selectedTimetableId
+        );
         const response = await api.get(
           `/api/attendance/session/${selectedTimetableId}/students`
         );
+
         setStudents(response.data.students);
         // Initialize all students as 'PRESENT' by default
         const initialAttendance = response.data.students.reduce(
