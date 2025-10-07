@@ -1,19 +1,20 @@
-// models/course.js
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Course extends Model {
     static associate(models) {
-      // A course can be taught to many classes through the timetable
+      // A Course belongs to a Department
+      Course.belongsTo(models.Department, {
+        foreignKey: "departmentId",
+        as: "department",
+      });
+
       Course.belongsToMany(models.Class, {
         through: "Timetable",
         foreignKey: "courseId",
         otherKey: "classId",
         as: "classes",
       });
-
-      // A course has many scheduled sessions in the timetable
-      Course.hasMany(models.Timetable, { foreignKey: "courseId" });
     }
   }
   Course.init(
@@ -26,6 +27,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
+      },
+      departmentId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "departments",
+          key: "id",
+        },
       },
     },
     {

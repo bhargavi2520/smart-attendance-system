@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "userId",
         as: "user",
       });
+      FacultyProfile.belongsTo(models.Department, {
+        foreignKey: "departmentId",
+        as: "department",
+      });
     }
   }
 
@@ -20,8 +24,9 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         references: { model: "users", key: "id" },
       },
-      department: {
-        type: DataTypes.STRING,
+      departmentId: {
+        type: DataTypes.INTEGER,
+        references: { model: "departments", key: "id" },
         allowNull: false,
       },
       designation: {

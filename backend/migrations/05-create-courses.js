@@ -1,4 +1,4 @@
-// migrations/06-create-courses.js
+// 20251007120500-create-courses.js
 "use strict";
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -15,8 +15,17 @@ module.exports = {
       },
       code: {
         type: Sequelize.STRING,
-        unique: true,
         allowNull: false,
+        unique: true,
+      },
+      department_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "departments",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
       },
       created_at: {
         allowNull: false,

@@ -7,8 +7,14 @@ import {
   BarChart3,
   Settings,
   HelpCircle,
+  Book,
+  Users,
+  UserCheck,
+  Calendar,
+  Shield,
 } from "lucide-react";
 import useAuth from "../../hooks/useAuth";
+import loginIcon from "../../assets/logo.png";
 
 const Sidebar = () => {
   const { activeRole } = useAuth(); // Using activeRole is better for users with multiple roles
@@ -16,6 +22,11 @@ const Sidebar = () => {
   const getNavLinks = () => {
     // Base links for all roles
     const base = [{ to: "/", text: "Dashboard", icon: <LayoutDashboard /> }];
+    const facultyLinks = [
+      { to: "/attendance", text: "Attendance", icon: <CalendarCheck /> },
+      { to: "/reports", text: "Reports", icon: <BarChart3 /> },
+    ];
+    const settings = { to: "/settings", text: "Settings", icon: <Settings /> };
 
     // Role-specific links
     switch (activeRole) {
@@ -27,23 +38,41 @@ const Sidebar = () => {
             text: "My Attendance",
             icon: <CalendarCheck />,
           },
+          settings,
         ];
       case "faculty":
         // CHANGED: Added the specific links for the faculty dashboard design
-        return [
-          ...base,
-          { to: "/attendance", text: "Attendance", icon: <CalendarCheck /> },
-          { to: "/reports", text: "Reports", icon: <BarChart3 /> },
-          { to: "/settings", text: "Settings", icon: <Settings /> },
-        ];
+        return [...base, ...facultyLinks, settings];
       case "hod":
         return [
           ...base,
+          ...facultyLinks,
           {
             to: "/reports/department",
             text: "Dept. Report",
             icon: <BarChart3 />,
           },
+          settings,
+        ];
+      case "principal":
+        return [
+          ...base,
+          ...facultyLinks,
+          {
+            to: "/reports/college",
+            text: "College Report",
+            icon: <BarChart3 />,
+          },
+          settings,
+        ];
+      case "admin":
+        // This is the new section that adds all the admin links
+        return [
+          ...base,
+          { to: "/admin/classes", text: "Class Management", icon: <Book /> },
+          { to: "/admin/users", text: "User Management", icon: <Users /> },
+          { to: "/admin/timetables", text: "Timetables", icon: <Calendar /> },
+          { to: "/admin/roles", text: "Roles & Permissions", icon: <Shield /> },
         ];
       default:
         return base;
@@ -61,9 +90,19 @@ const Sidebar = () => {
   return (
     <aside className="w-64 bg-gray-800 text-white flex flex-col">
       {/* ADDED: A professional header for the sidebar */}
-      <div className="px-6 py-4 border-b border-gray-700">
-        <h1 className="text-xl font-bold">EduTrack</h1>
-        <p className="text-xs text-gray-400">Smart Attendance</p>
+      <div className="px-6 py-4 border-b border-gray-700 flex items-center gap-3">
+        {/* Logo */}
+        <img
+          src={loginIcon}
+          alt="EduTrack Logo"
+          className="w-10 h-10 object-contain"
+        />
+
+        {/* Brand Name & Tagline */}
+        <div>
+          <h1 className="text-xl font-bold text-white">EduTrack</h1>
+          <p className="text-xs text-gray-400">Smart Attendance</p>
+        </div>
       </div>
 
       <nav className="flex-1 px-4 py-4 space-y-2">

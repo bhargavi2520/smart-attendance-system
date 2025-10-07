@@ -4,13 +4,18 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Class extends Model {
     static associate(models) {
-      // A class (section) has many students
+      Class.belongsTo(models.Department, {
+        foreignKey: "departmentId",
+        as: "department",
+      });
+      Class.belongsTo(models.User, {
+        foreignKey: "inchargeId",
+        as: "inCharge",
+      });
       Class.hasMany(models.StudentProfile, {
         foreignKey: "classId",
         as: "students",
       });
-
-      // A class is assigned many courses through the timetable
       Class.belongsToMany(models.Course, {
         through: "Timetable",
         foreignKey: "classId",
@@ -25,11 +30,17 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      department: {
-        type: DataTypes.STRING,
+      departmentId: {
+        type: DataTypes.INTEGER,
+        references: { model: "departments", key: "id" },
       },
       year: {
         type: DataTypes.INTEGER,
+      },
+      inchargeId: {
+        type: DataTypes.INTEGER,
+        references: { model: "users", key: "id" },
+        allowNull: true,
       },
     },
     {

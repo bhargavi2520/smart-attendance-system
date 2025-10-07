@@ -1,12 +1,15 @@
 // File: src/pages/Dashboard.jsx (WITH DEBUGGING LOGS)
 
 import useAuth from "../hooks/useAuth";
+import Spinner from "../components/ui/Spinner";
+import { Navigate } from "react-router-dom";
+
+//import all the role specific dashboard
 import StudentDashboard from "./dashboards/StudentDashboard";
 import FacultyDashboard from "./dashboards/FacultyDashboard";
 import HodDashboard from "./dashboards/HodDashboard";
 import PrincipalDashboard from "./dashboards/PrincipalDashboard";
-import Spinner from "../components/ui/Spinner";
-import { Navigate } from "react-router-dom";
+import AdminDashboard from "./dashboards/AdminDashboard";
 
 const Dashboard = () => {
   const { user, activeRole, loading } = useAuth();
@@ -46,7 +49,7 @@ const Dashboard = () => {
       console.log("Rendering PrincipalDashboard");
       return <PrincipalDashboard />;
     case "admin":
-      return <Navigate to="/admin/users" replace />;
+      return <AdminDashboard />;
     default:
       console.log(
         `Default case hit. ActiveRole is '${activeRole}'. Unable to render a matching dashboard.`

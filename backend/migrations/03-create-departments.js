@@ -1,29 +1,28 @@
-// migrations/05-create-faculty-profiles.js
+// 20251007120300-create-departments.js
 "use strict";
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("faculty_profiles", {
+    await queryInterface.createTable("departments", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      user_id: {
-        type: Sequelize.INTEGER,
+      name: {
+        type: Sequelize.STRING,
         allowNull: false,
         unique: true,
-        references: { model: "users", key: "id" },
+      },
+      hod_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "users",
+          key: "id",
+        },
+        allowNull: true,
         onUpdate: "CASCADE",
-        onDelete: "CASCADE",
-      },
-      department: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      designation: {
-        type: Sequelize.STRING,
-        allowNull: false,
+        onDelete: "SET NULL",
       },
       created_at: {
         allowNull: false,
@@ -36,6 +35,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("faculty_profiles");
+    await queryInterface.dropTable("departments");
   },
 };

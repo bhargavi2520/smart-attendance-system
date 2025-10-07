@@ -1,14 +1,14 @@
+// controllers/authController.js
 const db = require("../models");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
 const crypto = require("crypto");
 const { Resend } = require("resend");
 
-// Destructure all the models we'll need, including 'Class'
-const { User, Role, StudentProfile, FacultyProfile, Class } = db;
+// Destructure all models, ensuring Department is included
+const { User, Role, StudentProfile, FacultyProfile, Class, Department } = db;
 
-// HELPER: Function to get full user details efficiently
-
+// HELPER: This function is now corrected to properly join the Department table.
 const getFullUser = async (userId) => {
   const user = await User.findByPk(userId, {
     attributes: {
@@ -21,7 +21,14 @@ const getFullUser = async (userId) => {
         attributes: ["name"],
         through: { attributes: [] },
       },
-      { model: FacultyProfile, as: "facultyProfile" },
+      {
+        model: FacultyProfile,
+        as: "facultyProfile",
+        // Include the department for faculty profiles as well
+        include: [
+          { model: Department, as: "department", attributes: ["name"] },
+        ],
+      },
       {
         model: StudentProfile,
         as: "studentProfile",
@@ -29,7 +36,11 @@ const getFullUser = async (userId) => {
           {
             model: Class,
             as: "class",
-            attributes: ["id", "name", "department", "year"],
+            // This nested include is the crucial fix.
+            // It correctly joins the departments table to fetch the department name.
+            include: [
+              { model: Department, as: "department", attributes: ["name"] },
+            ],
           },
         ],
       },
@@ -46,17 +57,10 @@ const getFullUser = async (userId) => {
 
   return user;
 };
-// backend/controllers/authController.js
 
 const generateToken = (user, rememberMe = false) => {
-  // --- THIS IS THE FIX ---
-  // The user object already has a plain array of lowercase role strings.
-  // We can use it directly.
   const roles = user.roles;
-  // --- END OF FIX ---
-
   const expiresIn = rememberMe ? "7d" : "3h";
-
   return jwt.sign({ id: user.id, roles }, process.env.JWT_SECRET, {
     expiresIn,
   });

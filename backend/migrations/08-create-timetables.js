@@ -1,4 +1,4 @@
-// migrations/07-create-timetables.js
+// 20251007120800-create-timetables.js
 "use strict";
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -11,24 +11,27 @@ module.exports = {
       },
       course_id: {
         type: Sequelize.INTEGER,
-        references: { model: "courses", key: "id" },
-        onUpdate: "CASCADE",
+        references: {
+          model: "courses",
+          key: "id",
+        },
         onDelete: "CASCADE",
       },
       class_id: {
         type: Sequelize.INTEGER,
-        references: { model: "classes", key: "id" },
-        onUpdate: "CASCADE",
+        references: {
+          model: "classes",
+          key: "id",
+        },
         onDelete: "CASCADE",
       },
       faculty_id: {
         type: Sequelize.INTEGER,
-        references: { model: "users", key: "id" },
-        onUpdate: "CASCADE",
+        references: {
+          model: "users",
+          key: "id",
+        },
         onDelete: "SET NULL",
-      },
-      semester: {
-        type: Sequelize.INTEGER,
       },
       day_of_week: {
         type: Sequelize.STRING,
@@ -38,6 +41,9 @@ module.exports = {
       },
       end_time: {
         type: Sequelize.TIME,
+      },
+      semester: {
+        type: Sequelize.INTEGER,
       },
       created_at: {
         allowNull: false,

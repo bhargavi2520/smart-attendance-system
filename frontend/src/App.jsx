@@ -2,19 +2,30 @@ import { Route, Routes } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// Public Pages
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import NotFound from "./pages/NotFound";
+import SelectRole from "./pages/SelectRole";
+
+// Shared Pages
 import Dashboard from "./pages/Dashboard";
+
+// Student Pages
 import MyAttendance from "./pages/student/MyAttendance";
+
+// Faculty Pages
+import AttendancePage from "./pages/faculty/AttendancePage";
 import MarkAttendance from "./pages/faculty/MarkAttendance";
 import FacultyReportsPage from "./pages/faculty/FacultyReportsPage";
 import FacultySettingsPage from "./pages/faculty/FacultySettingsPage";
-import AttendancePage from "./pages/faculty/AttendancePage";
-import NotFound from "./pages/NotFound";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
+
+// Admin Pages
 import UserList from "./pages/admin/UserList";
 import UserForm from "./pages/admin/UserForm";
-import SelectRole from "./pages/SelectRole"; // Import the new component
+import ClassList from "./pages/admin/ClassList";
+// ... import other admin pages as you create them (ClassForm, DepartmentList, etc.)
 
 function App() {
   return (
@@ -23,7 +34,6 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
-
       <Route
         path="/select-role"
         element={
@@ -33,7 +43,7 @@ function App() {
         }
       />
 
-      {/* Protected Routes */}
+      {/* Main Protected Application */}
       <Route
         path="/"
         element={
@@ -42,7 +52,9 @@ function App() {
           </ProtectedRoute>
         }
       >
+        {/* Shared Dashboard Route */}
         <Route index element={<Dashboard />} />
+        <Route path="settings" element={<FacultySettingsPage />} />
 
         {/* Student Routes */}
         <Route
@@ -54,8 +66,7 @@ function App() {
           }
         />
 
-        {/* Faculty Routes */}
-
+        {/* Faculty & Staff Routes */}
         <Route
           path="attendance"
           element={
@@ -64,7 +75,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="mark-attendance/:timetableId"
           element={
@@ -81,18 +91,8 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="settings"
-          element={
-            <ProtectedRoute>
-              {" "}
-              {/* For all roles */}
-              <FacultySettingsPage />
-            </ProtectedRoute>
-          }
-        />
 
-        {/* Admin Routes */}
+        {/* Admin Routes - NESTED INSIDE THE MAIN LAYOUT */}
         <Route
           path="admin/users"
           element={
@@ -117,6 +117,15 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="admin/classes"
+          element={
+            <ProtectedRoute roles={["admin"]}>
+              <ClassList />
+            </ProtectedRoute>
+          }
+        />
+        {/* Add other admin routes here */}
       </Route>
 
       {/* Not Found Route */}

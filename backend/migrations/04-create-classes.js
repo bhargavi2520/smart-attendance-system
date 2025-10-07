@@ -1,31 +1,37 @@
-// migrations/04-create-student-profiles.js
+// 20251007120400-create-classes.js
 "use strict";
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("student_profiles", {
+    await queryInterface.createTable("classes", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      user_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        unique: true,
-        references: { model: "users", key: "id" },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
-      },
-      roll_number: {
+      name: {
         type: Sequelize.STRING,
-        unique: true,
         allowNull: false,
       },
-      class_id: {
+      department_id: {
         type: Sequelize.INTEGER,
+        references: {
+          model: "departments",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      },
+      year: {
+        type: Sequelize.INTEGER,
+      },
+      incharge_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "users",
+          key: "id",
+        },
         allowNull: true,
-        references: { model: "classes", key: "id" },
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       },
@@ -40,6 +46,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("student_profiles");
+    await queryInterface.dropTable("classes");
   },
 };

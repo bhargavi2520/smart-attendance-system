@@ -1,4 +1,4 @@
-// migrations/08-create-attendances.js
+// 20251007120900-create-attendances.js
 "use strict";
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -11,28 +11,32 @@ module.exports = {
       },
       student_id: {
         type: Sequelize.INTEGER,
-        references: { model: "users", key: "id" },
-        onUpdate: "CASCADE",
+        references: {
+          model: "users",
+          key: "id",
+        },
         onDelete: "CASCADE",
       },
       timetable_id: {
         type: Sequelize.INTEGER,
-        references: { model: "timetables", key: "id" },
-        onUpdate: "CASCADE",
+        references: {
+          model: "timetables",
+          key: "id",
+        },
         onDelete: "CASCADE",
       },
       date: {
         type: Sequelize.DATEONLY,
-        allowNull: false,
       },
       status: {
         type: Sequelize.ENUM("PRESENT", "ABSENT", "LATE"),
-        allowNull: false,
       },
       marked_by: {
         type: Sequelize.INTEGER,
-        references: { model: "users", key: "id" },
-        onUpdate: "CASCADE",
+        references: {
+          model: "users",
+          key: "id",
+        },
         onDelete: "SET NULL",
       },
       created_at: {
