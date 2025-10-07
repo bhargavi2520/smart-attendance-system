@@ -1,47 +1,71 @@
 // controllers/classController.js
 const db = require("../models");
-const { Class, Department, User } = db;
 
-exports.getAllClasses = async (req, res) => {
+exports.createClass = async (req, res) => {
+  const { name, departmentId, year, inchargeId } = req.body;
   try {
-    const classes = await Class.findAll({
-      include: [
-        { model: Department, as: "department", attributes: ["name"] },
-        { model: User, as: "inCharge", attributes: ["id", "name"] },
-      ],
-      order: [
-        ["year", "DESC"],
-        ["name", "ASC"],
-      ],
+    if (!name || !departmentId || !year) {
+      return res
+        .status(400)
+        .json({ message: "Name, Department, and Year are required." });
+    }
+    const newClass = await db.Class.create({
+      name,
+      departmentId,
+      year,
+      inchargeId,
     });
-    res.json(classes);
+    res.status(201).json(newClass);
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    console.error("Failed to create class:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
-exports.createClass = async (req, res) => {
+exports.getAllClasses = async (req, res) => {
   try {
-    const newClass = await Class.create(req.body);
-    res.status(201).json(newClass);
+    const classes = await db.Class.findAll({
+      include: ["department", "inCharge"],
+    });
+    res.json(classes);
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Error creating class", error: error.message });
+    console.error("Failed to get classes:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.getClassById = async (req, res) => {
+  try {
+    const singleClass = await db.Class.findByPk(req.params.id);
+    if (!singleClass)
+      return res.status(404).json({ message: "Class not found" });
+    res.json(singleClass);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.updateClass = async (req, res) => {
+  try {
+    const { name, departmentId, year, inchargeId } = req.body;
+    const [updated] = await db.Class.update(
+      { name, departmentId, year, inchargeId },
+      { where: { id: req.params.id } }
+    );
+    if (!updated) return res.status(404).json({ message: "Class not found" });
+    const updatedClass = await db.Class.findByPk(req.params.id);
+    res.json(updatedClass);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 exports.deleteClass = async (req, res) => {
   try {
-    const classInstance = await Class.findByPk(req.params.id);
-    if (!classInstance) {
-      return res.status(404).json({ message: "Class not found" });
-    }
-    await classInstance.destroy();
-    res.status(204).send(); // No content
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error deleting class", error: error.message });
+    const deleted = await db.Class.destroy({ where: { id: req.params.id } });
+    if (!deleted) return res.status(404).json({ message: "Class not found" });
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
 };

@@ -1,18 +1,23 @@
 const express = require("express");
 const router = express.Router();
+const { protect, authorize } = require("../middleware/authMiddleware");
 const {
-  getAllUsers,
   createUser,
+  getAllUsers,
   updateUser,
   deleteUser,
 } = require("../controllers/userController");
-const { protect, authorize } = require("../middleware/authMiddleware");
 
-// All routes in this file are protected and restricted to PRINCIPAL role
-router.use(protect, authorize("ADMIN", "PRINCIPAL"));
+// Route for getting all users and creating a new user
+router
+  .route("/")
+  .get(protect, authorize("ADMIN"), getAllUsers)
+  .post(protect, authorize("ADMIN"), createUser);
 
-router.route("/").get(getAllUsers).post(createUser);
-
-router.route("/:id").put(updateUser).delete(deleteUser);
+// Route for updating and deleting a specific user
+router
+  .route("/:id")
+  .put(protect, authorize("ADMIN"), updateUser)
+  .delete(protect, authorize("ADMIN"), deleteUser);
 
 module.exports = router;

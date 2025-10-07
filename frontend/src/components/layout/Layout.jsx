@@ -1,5 +1,5 @@
 // File: src/components/layout/Layout.jsx (Updated)
-
+import React from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar"; // ADDED: Import the Sidebar
@@ -13,7 +13,7 @@ const Layout = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
         {/* The main content area is now scrollable */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
           <div className="mx-auto max-w-7xl py-6 px-4 sm:px-6 lg:px-8">
             <Outlet /> {/* Renders the current page */}
           </div>

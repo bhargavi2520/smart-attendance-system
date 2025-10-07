@@ -3,16 +3,20 @@ const db = require("../models");
 
 exports.getStats = async (req, res) => {
   try {
-    const userCount = await db.User.count();
-    const classCount = await db.Class.count();
-    const departmentCount = await db.Department.count();
-    const timetableCount = await db.Timetable.count();
+    // Count the number of student profiles to get the total students
+    const totalStudents = await db.StudentProfile.count();
 
+    // Count the number of faculty profiles to get the total faculty
+    const totalFaculty = await db.FacultyProfile.count();
+
+    // Count the number of classes
+    const totalClasses = await db.Class.count();
+
+    // Send the correctly named stats to the frontend
     res.json({
-      totalUsers: userCount,
-      totalClasses: classCount,
-      totalDepartments: departmentCount,
-      totalTimetables: timetableCount,
+      totalClasses,
+      totalStudents,
+      totalFaculty,
     });
   } catch (error) {
     console.error("Dashboard stats error:", error);

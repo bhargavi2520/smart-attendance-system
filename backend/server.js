@@ -19,6 +19,7 @@ const userRoutes = require("./routes/userRoutes");
 const facultyRoutes = require("./routes/facultyRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes"); // Import dashboard routes
 const classRoutes = require("./routes/classRoutes");
+const departmentRoutes = require("./routes/departmentRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -61,6 +62,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/faculty", facultyRoutes);
 app.use("/api/dashboard", dashboardRoutes); // Register dashboard routes
 app.use("/api/classes", classRoutes);
+app.use("/api/departments", departmentRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to the Smart Attendance System API." });

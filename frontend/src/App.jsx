@@ -25,6 +25,11 @@ import FacultySettingsPage from "./pages/faculty/FacultySettingsPage";
 import UserList from "./pages/admin/UserList";
 import UserForm from "./pages/admin/UserForm";
 import ClassList from "./pages/admin/ClassList";
+import FacultyManagement from "./pages/admin/FacultyManagement";
+import TimetableManagement from "./pages/admin/TimetableManagement";
+import StudentManagement from "./pages/admin/StudentManagement";
+import ClassForm from "./pages/admin/ClassForm";
+
 // ... import other admin pages as you create them (ClassForm, DepartmentList, etc.)
 
 function App() {
@@ -94,14 +99,6 @@ function App() {
 
         {/* Admin Routes - NESTED INSIDE THE MAIN LAYOUT */}
         <Route
-          path="admin/users"
-          element={
-            <ProtectedRoute roles={["admin"]}>
-              <UserList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="admin/users/add"
           element={
             <ProtectedRoute roles={["admin"]}>
@@ -122,6 +119,46 @@ function App() {
           element={
             <ProtectedRoute roles={["admin"]}>
               <ClassList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/classes/add"
+          element={
+            <ProtectedRoute roles={["admin"]}>
+              <ClassForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/classes/edit/:id"
+          element={
+            <ProtectedRoute roles={["admin"]}>
+              <ClassForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/students"
+          element={
+            <ProtectedRoute roles={["admin"]}>
+              <StudentManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/faculty"
+          element={
+            <ProtectedRoute roles={["admin"]}>
+              <FacultyManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/timetables"
+          element={
+            <ProtectedRoute roles={["admin"]}>
+              <TimetableManagement />
             </ProtectedRoute>
           }
         />

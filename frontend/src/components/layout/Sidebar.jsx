@@ -15,6 +15,13 @@ import {
 } from "lucide-react";
 import useAuth from "../../hooks/useAuth";
 import loginIcon from "../../assets/logo.png";
+import {
+  FiGrid,
+  FiBookOpen,
+  FiUsers,
+  FiUserCheck,
+  FiClock,
+} from "react-icons/fi";
 
 const Sidebar = () => {
   const { activeRole } = useAuth(); // Using activeRole is better for users with multiple roles
@@ -70,9 +77,21 @@ const Sidebar = () => {
         return [
           ...base,
           { to: "/admin/classes", text: "Class Management", icon: <Book /> },
-          { to: "/admin/users", text: "User Management", icon: <Users /> },
-          { to: "/admin/timetables", text: "Timetables", icon: <Calendar /> },
-          { to: "/admin/roles", text: "Roles & Permissions", icon: <Shield /> },
+          {
+            to: "/admin/students",
+            text: "Student Management",
+            icon: <Users />,
+          },
+          {
+            to: "/admin/faculty",
+            text: "Faculty Management",
+            icon: <UserCheck />,
+          },
+          {
+            to: "/admin/timetables",
+            text: "Timetable Management",
+            icon: <Calendar />,
+          },
         ];
       default:
         return base;
