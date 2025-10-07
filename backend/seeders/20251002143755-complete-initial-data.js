@@ -329,8 +329,18 @@ module.exports = {
       }
     );
     userRoles.push(
+      { user_id: 1001, role_id: 1, created_at: now, updated_at: now },
+      { user_id: 1001, role_id: 2, created_at: now, updated_at: now },
+      { user_id: 1001, role_id: 3, created_at: now, updated_at: now },
+      { user_id: 1001, role_id: 4, created_at: now, updated_at: now },
       { user_id: 1001, role_id: 5, created_at: now, updated_at: now },
+      { user_id: 1001, role_id: 6, created_at: now, updated_at: now },
+      { user_id: 1002, role_id: 1, created_at: now, updated_at: now },
+      { user_id: 1002, role_id: 2, created_at: now, updated_at: now },
+      { user_id: 1002, role_id: 3, created_at: now, updated_at: now },
+      { user_id: 1002, role_id: 4, created_at: now, updated_at: now },
       { user_id: 1002, role_id: 5, created_at: now, updated_at: now },
+      { user_id: 1002, role_id: 6, created_at: now, updated_at: now },
       { user_id: 1, role_id: 2, created_at: now, updated_at: now },
       { user_id: 2, role_id: 1, created_at: now, updated_at: now }
     );
