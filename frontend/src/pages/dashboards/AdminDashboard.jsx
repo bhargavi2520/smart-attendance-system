@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import api from "../../../services/api";
-import Spinner from "../../../components/ui/Spinner";
+import api from "../../services/api";
+import Spinner from "../../components/ui/Spinner";
 
 // Import the forms that will be used in the modals
-import ClassForm from "../../admin/ClassForm";
-import UserForm from "../../admin/UserForm";
+import ClassForm from "../admin/ClassForm";
+import UserForm from "../admin/UserForm";
 
 const StatCard = ({ title, value, icon }) => (
   <div className="bg-white p-6 rounded-lg shadow-md flex items-center">

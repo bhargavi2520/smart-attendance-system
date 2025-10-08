@@ -334,13 +334,11 @@ module.exports = {
       { user_id: 1001, role_id: 3, created_at: now, updated_at: now },
       { user_id: 1001, role_id: 4, created_at: now, updated_at: now },
       { user_id: 1001, role_id: 5, created_at: now, updated_at: now },
-      { user_id: 1001, role_id: 6, created_at: now, updated_at: now },
       { user_id: 1002, role_id: 1, created_at: now, updated_at: now },
       { user_id: 1002, role_id: 2, created_at: now, updated_at: now },
       { user_id: 1002, role_id: 3, created_at: now, updated_at: now },
       { user_id: 1002, role_id: 4, created_at: now, updated_at: now },
       { user_id: 1002, role_id: 5, created_at: now, updated_at: now },
-      { user_id: 1002, role_id: 6, created_at: now, updated_at: now },
       { user_id: 1, role_id: 2, created_at: now, updated_at: now },
       { user_id: 2, role_id: 1, created_at: now, updated_at: now }
     );
@@ -476,6 +474,7 @@ module.exports = {
 
     // -- 3. TIMETABLES --
     const timetables = [];
+    // --- START: CORRECTED TIME SLOTS ---
     const timeSlots = [
       ["09:00:00", "10:00:00"],
       ["10:00:00", "11:00:00"],
@@ -483,10 +482,21 @@ module.exports = {
       ["13:00:00", "14:00:00"],
       ["14:00:00", "15:00:00"],
       ["15:00:00", "16:00:00"],
+      ["16:00:00", "17:00:00"], // Added 4pm-5pm slot
     ];
-    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    // --- END: CORRECTED TIME SLOTS ---
 
-    // --- START: MODIFIED TIMETABLE GENERATION LOGIC ---
+    // --- START: CORRECTED DAYS ARRAY ---
+    const days = [
+      "MONDAY",
+      "TUESDAY",
+      "WEDNESDAY",
+      "THURSDAY",
+      "FRIDAY",
+      "SATURDAY",
+    ];
+    // --- END: CORRECTED DAYS ARRAY ---
+
     for (const cls of classes) {
       const deptCourses = courses.filter(
         (c) => c.department_id === cls.department_id
@@ -494,15 +504,13 @@ module.exports = {
       const facultyPool = facultyMapByDept[cls.department_id];
 
       if (deptCourses.length === 0 || facultyPool.length === 0) {
-        continue; // Skip if no courses or faculty for the department
+        continue;
       }
 
       let courseIndex = 0;
       let facultyIndex = 0;
 
-      // Loop through each day of the week
       for (const day of days) {
-        // Loop through each time slot for the day
         for (const slot of timeSlots) {
           const course = deptCourses[courseIndex % deptCourses.length];
           const faculty = facultyPool[facultyIndex % facultyPool.length];
@@ -512,20 +520,18 @@ module.exports = {
             class_id: cls.id,
             faculty_id: faculty,
             semester: 1,
-            day_of_week: day,
+            day_of_week: day, // This will now be UPPERCASE
             start_time: slot[0],
             end_time: slot[1],
             created_at: now,
             updated_at: now,
           });
 
-          // Increment to cycle through courses and faculty
           courseIndex++;
           facultyIndex++;
         }
       }
     }
-    // --- END: MODIFIED TIMETABLE GENERATION LOGIC ---
 
     await queryInterface.bulkInsert("timetables", timetables);
 
@@ -544,22 +550,19 @@ module.exports = {
 
       if (students.length === 0) continue;
 
-      // Create attendance for two days ago
       const date1 = new Date();
       date1.setDate(date1.getDate() - 2);
 
-      // Create attendance for yesterday
       const date2 = new Date();
       date2.setDate(date2.getDate() - 1);
 
       for (const date of [date1, date2]) {
         for (let i = 0; i < 5; i++) {
-          // Mark for first 5 students
           if (students[i]) {
             attendanceRecords.push({
               student_id: students[i].user_id,
               timetable_id: entry.id,
-              status: i % 2 === 0 ? "PRESENT" : "ABSENT", // Alternate status
+              status: i % 2 === 0 ? "PRESENT" : "ABSENT",
               date: date.toISOString().split("T")[0],
               marked_by: entry.faculty_id,
               created_at: now,
