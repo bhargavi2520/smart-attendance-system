@@ -15,7 +15,23 @@ exports.getAllUsers = async (req, res) => {
           attributes: ["name"],
           through: { attributes: [] },
         },
-        { model: db.StudentProfile, as: "studentProfile", include: ["class"] },
+        {
+          model: db.StudentProfile,
+          as: "studentProfile",
+          include: [
+            {
+              model: db.Class,
+              as: "class",
+              include: [
+                {
+                  model: db.Department,
+                  as: "department",
+                  attributes: ["name"], // Crucially include the department name
+                },
+              ],
+            },
+          ],
+        },
         {
           model: db.FacultyProfile,
           as: "facultyProfile",
@@ -23,6 +39,7 @@ exports.getAllUsers = async (req, res) => {
         },
       ],
       attributes: { exclude: ["password"] },
+      order: [["name", "ASC"]], // Sort users by name
     };
 
     if (role) {
@@ -74,11 +91,9 @@ exports.createUser = async (req, res) => {
     if (role === "STUDENT") {
       if (!rollNumber || !classId) {
         await t.rollback();
-        return res
-          .status(400)
-          .json({
-            message: "Roll number and Class are required for students.",
-          });
+        return res.status(400).json({
+          message: "Roll number and Class are required for students.",
+        });
       }
       await db.StudentProfile.create(
         { userId: user.id, rollNumber, classId },
@@ -87,11 +102,9 @@ exports.createUser = async (req, res) => {
     } else {
       if (!department || !designation) {
         await t.rollback();
-        return res
-          .status(400)
-          .json({
-            message: "Department and Designation are required for staff.",
-          });
+        return res.status(400).json({
+          message: "Department and Designation are required for staff.",
+        });
       }
 
       const dept = await db.Department.findOne(

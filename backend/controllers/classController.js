@@ -1,4 +1,4 @@
-// controllers/classController.js
+const { sequelize } = require("../models");
 const db = require("../models");
 
 exports.createClass = async (req, res) => {
@@ -22,10 +22,37 @@ exports.createClass = async (req, res) => {
   }
 };
 
+// MODIFIED: This function now includes student count and associated names.
 exports.getAllClasses = async (req, res) => {
   try {
     const classes = await db.Class.findAll({
-      include: ["department", "inCharge"],
+      attributes: {
+        include: [
+          [sequelize.fn("COUNT", sequelize.col("students.id")), "studentCount"],
+        ],
+      },
+      include: [
+        {
+          model: db.Department,
+          as: "department",
+          attributes: ["name"], // Only fetch the name
+        },
+        {
+          model: db.User,
+          as: "inCharge",
+          attributes: ["name"], // Only fetch the name
+        },
+        {
+          model: db.StudentProfile,
+          as: "students",
+          attributes: [], // Used only for counting, so no attributes needed
+        },
+      ],
+      group: ["Class.id", "department.id", "inCharge.id"],
+      order: [
+        ["year", "DESC"],
+        ["name", "ASC"],
+      ],
     });
     res.json(classes);
   } catch (error) {
@@ -36,7 +63,9 @@ exports.getAllClasses = async (req, res) => {
 
 exports.getClassById = async (req, res) => {
   try {
-    const singleClass = await db.Class.findByPk(req.params.id);
+    const singleClass = await db.Class.findByPk(req.params.id, {
+      include: ["department", "inCharge"], // Also include details when fetching one
+    });
     if (!singleClass)
       return res.status(404).json({ message: "Class not found" });
     res.json(singleClass);
