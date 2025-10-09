@@ -135,4 +135,12 @@ export const principalData = {
     },
     { text: "3 faculty members are on leave today.", severity: "info" },
   ],
+  departmentAttendance: [
+    { name: "CSE", attendance: 95 },
+    { name: "ECE", attendance: 91 },
+    { name: "EEE", attendance: 88 },
+    { name: "MECH", attendance: 93 },
+    { name: "CSM", attendance: 96 },
+    { name: "CSD", attendance: 94 },
+  ],
 };

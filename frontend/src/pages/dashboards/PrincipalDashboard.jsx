@@ -10,6 +10,15 @@ import {
   AlertTriangle,
   Info,
 } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 import { principalData } from "../../components/layout/dummy-data";
 import useAuth from "../../hooks/useAuth";
 
@@ -69,6 +78,35 @@ const Alerts = () => (
   </div>
 );
 
+const DepartmentAttendanceChart = () => (
+  <div className="bg-white p-6 rounded-xl shadow-md h-full">
+    <h3 className="text-lg font-bold text-gray-800 mb-4">
+      Department-wise Attendance (Today)
+    </h3>
+    <div className="h-80">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={principalData.departmentAttendance}
+          margin={{
+            top: 5,
+            right: 20,
+            left: -10,
+            bottom: 5,
+          }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+          <XAxis dataKey="name" fontSize={12} />
+          <YAxis unit="%" domain={[70, 100]} fontSize={12} />
+          <Tooltip
+            cursor={{ fill: "rgba(238, 242, 255, 0.6)" }}
+            contentStyle={{ borderRadius: "8px", borderColor: "#e0e0e0" }}
+          />
+          <Bar dataKey="attendance" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+);
+
 const PrincipalDashboard = () => {
   const { user } = useAuth();
   const { overview } = principalData;
@@ -123,12 +161,7 @@ const PrincipalDashboard = () => {
       {/* Lower Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          {/* In the future, a chart can go here */}
-          <div className="bg-white p-6 rounded-xl shadow-md h-full flex items-center justify-center">
-            <p className="text-gray-500">
-              Department-wise Attendance Chart will be here.
-            </p>
-          </div>
+          <DepartmentAttendanceChart />
         </div>
         <div className="space-y-8">
           <UpcomingEvents />
