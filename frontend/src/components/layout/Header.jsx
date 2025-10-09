@@ -1,15 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import { LogOut, ArrowLeftRight, Repeat, Shuffle } from "lucide-react";
+import { LogOut, Repeat, Menu } from "lucide-react";
 
 const getPageTitle = (pathname) => {
-  const name = pathname.split("/").pop().replace("-", " ");
+  const name = pathname.split("/").pop().replace(/-/g, " ");
   if (name === "" || name === "admin") return "Dashboard";
   return name.charAt(0).toUpperCase() + name.slice(1);
 };
 
-const Header = () => {
+const Header = ({ setSidebarOpen = () => {} }) => {
   const { user, logout, setActiveRole } = useAuth();
   const location = useLocation();
   const pageTitle = getPageTitle(location.pathname);
@@ -50,11 +50,18 @@ const Header = () => {
 
   return (
     <header className="bg-white shadow-sm border-b">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* ✅ KEEPING YOUR EXACT TITLE BLOCK */}
           <div className="flex items-center">
-            <h1 className="text-2xl font-semibold text-gray-900">
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden -ml-2 mr-2 p-2 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+              aria-label="Open sidebar">
+              <Menu className="h-6 w-6" />
+            </button>
+
+            <h1 className="text-xl md:text-2xl font-semibold text-gray-900">
               {pageTitle}
             </h1>
           </div>
@@ -66,8 +73,7 @@ const Header = () => {
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center space-x-2 rounded-md p-2 border border-gray-300 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  title="Switch Role"
-                >
+                  title="Switch Role">
                   <Repeat className="h-4 w-4" />
                   <span className="capitalize">
                     {activeRole || "Switch Role"}
@@ -79,8 +85,7 @@ const Header = () => {
                     <div
                       className="py-1"
                       role="menu"
-                      aria-orientation="vertical"
-                    >
+                      aria-orientation="vertical">
                       <p className="px-4 pt-2 pb-1 text-xs text-gray-500">
                         Switch to:
                       </p>
@@ -89,8 +94,7 @@ const Header = () => {
                           key={role}
                           onClick={() => handleRoleSelect(role)}
                           className="w-full text-left block px-4 py-2 text-sm text-gray-700 capitalize hover:bg-gray-100 hover:text-gray-900"
-                          role="menuitem"
-                        >
+                          role="menuitem">
                           {role}
                         </button>
                       ))}
@@ -114,8 +118,7 @@ const Header = () => {
               onClick={logout}
               type="button"
               className="p-2 rounded-full text-gray-500 hover:text-red-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-              title="Log out"
-            >
+              title="Log out">
               <span className="sr-only">Log out</span>
               <LogOut className="h-5 w-5" />
             </button>
