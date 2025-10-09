@@ -55,10 +55,16 @@ function App() {
           <ProtectedRoute>
             <Layout />
           </ProtectedRoute>
-        }
-      >
+        }>
         {/* Shared Dashboard Route */}
         <Route index element={<Dashboard />} />
+        {/* Add role-specific dashboard routes to fix 404 errors */}
+        <Route path="student/dashboard" element={<Dashboard />} />
+        <Route path="faculty/dashboard" element={<Dashboard />} />
+        <Route path="hod/dashboard" element={<Dashboard />} />
+        <Route path="principal/dashboard" element={<Dashboard />} />
+        <Route path="admin/dashboard" element={<Dashboard />} />
+
         <Route path="settings" element={<FacultySettingsPage />} />
 
         {/* Student Routes */}

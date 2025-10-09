@@ -1,5 +1,5 @@
 // File: src/components/layout/Layout.jsx (Updated)
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar"; // ADDED: Import the Sidebar
@@ -16,9 +16,16 @@ const Layout = () => {
         <Header setSidebarOpen={setSidebarOpen} />
         {/* The main content area is now scrollable */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
-          <div className="mx-auto max-w-7xl py-6 px-4 sm:px-6 lg:px-8">
-            <Outlet /> {/* Renders the current page */}
-          </div>
+          <Suspense
+            fallback={
+              <div className="flex h-full items-center justify-center">
+                <div className="text-lg font-semibold text-gray-500">
+                  Loading...
+                </div>
+              </div>
+            }>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>
