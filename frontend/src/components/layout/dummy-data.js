@@ -110,3 +110,29 @@ export const facultyData = {
     },
   ],
 };
+
+export const principalData = {
+  overview: {
+    totalStudents: 1250,
+    totalFaculty: 75,
+    totalDepartments: 6,
+    studentsPresentToday: 1150,
+    averageAttendance: 92, // percentage
+  },
+  upcomingEvents: [
+    {
+      date: "Oct 28",
+      title: "Annual Tech Fest 'Innovate 2025'",
+      type: "event",
+    },
+    { date: "Nov 05", title: "Mid-Term Examinations Begin", type: "exam" },
+    { date: "Nov 15", title: "Diwali Vacation Starts", type: "holiday" },
+  ],
+  alerts: [
+    {
+      text: "ECE department attendance has dropped by 5% this week.",
+      severity: "warning",
+    },
+    { text: "3 faculty members are on leave today.", severity: "info" },
+  ],
+};

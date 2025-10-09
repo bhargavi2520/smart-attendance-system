@@ -1,86 +1,140 @@
-import { useState, useEffect } from "react";
-import api from "../../services/api";
-import Card from "../../components/ui/Card";
-import Spinner from "../../components/ui/Spinner";
-import AttendanceBarChart from "../../components/charts/AttendanceBarChart";
-import { Building, Percent } from "lucide-react";
+import React from "react";
+import {
+  Users,
+  UserCheck,
+  Building,
+  UserX,
+  TrendingUp,
+  Calendar,
+  Bell,
+  AlertTriangle,
+  Info,
+} from "lucide-react";
+import { principalData } from "../../components/layout/dummy-data";
+import useAuth from "../../hooks/useAuth";
+
+const StatCard = ({ title, value, icon: Icon, color }) => (
+  <div className="bg-white p-6 rounded-xl shadow-md transition-all hover:shadow-lg hover:-translate-y-1">
+    <Icon className={`w-10 h-10 mb-3 ${color}`} />
+    <p className="text-4xl font-bold text-gray-800">{value}</p>
+    <p className="text-sm font-medium text-gray-500 mt-1">{title}</p>
+  </div>
+);
+
+const UpcomingEvents = () => (
+  <div className="bg-white p-6 rounded-xl shadow-md">
+    <h3 className="text-lg font-bold text-gray-800 mb-4">
+      Upcoming Events & Holidays
+    </h3>
+    <div className="space-y-4">
+      {principalData.upcomingEvents.map((event, index) => (
+        <div key={index} className="flex items-center">
+          <div className="w-12 h-12 bg-gray-100 rounded-lg flex flex-col items-center justify-center mr-4">
+            <span className="text-sm font-bold text-gray-700">
+              {event.date.split(" ")[0]}
+            </span>
+            <span className="text-xs text-gray-500">
+              {event.date.split(" ")[1]}
+            </span>
+          </div>
+          <div>
+            <p className="font-semibold text-gray-800">{event.title}</p>
+            <p className="text-xs capitalize text-gray-500">{event.type}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const Alerts = () => (
+  <div className="bg-white p-6 rounded-xl shadow-md">
+    <h3 className="text-lg font-bold text-gray-800 mb-4">Notices & Alerts</h3>
+    <div className="space-y-3">
+      {principalData.alerts.map((alert, index) => (
+        <div
+          key={index}
+          className={`flex items-start p-3 rounded-lg ${
+            alert.severity === "warning" ? "bg-yellow-50" : "bg-blue-50"
+          }`}>
+          {alert.severity === "warning" ? (
+            <AlertTriangle className="w-5 h-5 text-yellow-500 mr-3 mt-0.5 flex-shrink-0" />
+          ) : (
+            <Info className="w-5 h-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
+          )}
+          <p className="text-sm text-gray-700">{alert.text}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const PrincipalDashboard = () => {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { user } = useAuth();
+  const { overview } = principalData;
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await api.get("/analytics/institution");
-        setStats(response.data);
-      } catch (err) {
-        setError("Failed to fetch institution statistics.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStats();
-  }, []);
-
-  if (loading) return <Spinner />;
-  if (error) return <p className="text-red-500">{error}</p>;
-
-  const chartData =
-    stats?.departmentStats.map((d) => ({
-      name: d.department,
-      percentage: d.percentage,
-    })) || [];
+  const studentsAbsent = overview.totalStudents - overview.studentsPresentToday;
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">
-        Institution Dashboard
-      </h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <Card>
-          <div className="flex items-center">
-            <div className="p-3 rounded-full bg-indigo-100 text-indigo-600">
-              <Percent className="w-6 h-6" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">
-                Institution-Wide Attendance
-              </p>
-              <p className="text-2xl font-bold text-gray-900">
-                {stats?.overallPercentage.toFixed(2)}%
-              </p>
-            </div>
-          </div>
-        </Card>
-        <Card>
-          <div className="flex items-center">
-            <div className="p-3 rounded-full bg-green-100 text-green-600">
-              <Building className="w-6 h-6" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">
-                Departments Monitored
-              </p>
-              <p className="text-2xl font-bold text-gray-900">
-                {stats?.departmentStats.length}
-              </p>
-            </div>
-          </div>
-        </Card>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-800">
+          Principal's Dashboard
+        </h1>
+        <p className="text-gray-600">
+          Welcome, {user?.name}. Here's an overview of the institution today.
+        </p>
       </div>
 
-      <Card>
-        <AttendanceBarChart
-          data={chartData}
-          barKey="percentage"
-          xAxisKey="name"
-          title="Attendance by Department"
+      {/* Stat Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <StatCard
+          title="Total Students"
+          value={overview.totalStudents}
+          icon={Users}
+          color="text-blue-500"
         />
-      </Card>
+        <StatCard
+          title="Total Faculty"
+          value={overview.totalFaculty}
+          icon={UserCheck}
+          color="text-indigo-500"
+        />
+        <StatCard
+          title="Total Departments"
+          value={overview.totalDepartments}
+          icon={Building}
+          color="text-purple-500"
+        />
+        <StatCard
+          title="Students Absent"
+          value={studentsAbsent}
+          icon={UserX}
+          color="text-red-500"
+        />
+        <StatCard
+          title="Avg. Attendance"
+          value={`${overview.averageAttendance}%`}
+          icon={TrendingUp}
+          color="text-green-500"
+        />
+      </div>
+
+      {/* Lower Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          {/* In the future, a chart can go here */}
+          <div className="bg-white p-6 rounded-xl shadow-md h-full flex items-center justify-center">
+            <p className="text-gray-500">
+              Department-wise Attendance Chart will be here.
+            </p>
+          </div>
+        </div>
+        <div className="space-y-8">
+          <UpcomingEvents />
+          <Alerts />
+        </div>
+      </div>
     </div>
   );
 };
