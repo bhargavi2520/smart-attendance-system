@@ -44,9 +44,19 @@ const Header = ({ setSidebarOpen = () => {} }) => {
     };
   }, []);
 
-  const otherRoles = user?.roles?.filter(
+  let otherRoles = user?.roles?.filter(
     (role) => role.toLowerCase() !== activeRole?.toLowerCase()
   );
+
+  // When on a faculty-type dashboard, only show other relevant faculty roles.
+  const isFacultyView = ["faculty", "hod", "principal"].includes(activeRole);
+  if (isFacultyView) {
+    otherRoles = otherRoles?.filter(
+      (role) =>
+        // Only show the 'incharge' role as a switchable option for faculty
+        role.toLowerCase() === "incharge"
+    );
+  }
 
   return (
     <header className="bg-white shadow-sm border-b">
