@@ -7,19 +7,10 @@ import { Navigate } from "react-router-dom";
 //import all the role specific dashboard
 import StudentDashboard from "./dashboards/StudentDashboard";
 import FacultyDashboard from "./dashboards/FacultyDashboard";
-import HodDashboard from "./dashboards/HodDashboard";
-import PrincipalDashboard from "./dashboards/PrincipalDashboard";
 import AdminDashboard from "./dashboards/AdminDashboard";
 
 const Dashboard = () => {
   const { user, activeRole, loading } = useAuth();
-
-  // Let's see what the useAuth hook is giving us.
-  console.log("--- Dashboard Gatekeeper ---");
-  console.log("Loading status:", loading);
-  console.log("User object:", user);
-  console.log("Active Role:", activeRole);
-  console.log("--------------------------");
 
   if (loading || !user) {
     // If we are stuck here, the auth context is not providing the user object yet.
@@ -37,23 +28,16 @@ const Dashboard = () => {
   // Render dashboard based on the single active role.
   switch (activeRole) {
     case "student":
-      console.log("Rendering StudentDashboard");
       return <StudentDashboard />;
     case "faculty":
-      console.log("Rendering FacultyDashboard");
-      return <FacultyDashboard />;
     case "hod":
-      console.log("Rendering HodDashboard");
-      return <HodDashboard />;
     case "principal":
-      console.log("Rendering PrincipalDashboard");
-      return <PrincipalDashboard />;
+      return <FacultyDashboard />;
     case "admin":
       return <AdminDashboard />;
     default:
-      console.log(
-        `Default case hit. ActiveRole is '${activeRole}'. Unable to render a matching dashboard.`
-      );
+      // This case handles the brief moment before the activeRole is set
+      // or if the role is somehow invalid.
       if (user.roles.length > 0) {
         return <Spinner />;
       }

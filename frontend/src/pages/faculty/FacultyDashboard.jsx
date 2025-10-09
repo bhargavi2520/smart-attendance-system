@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import { facultyData } from "../../components/layout/dummy-data";
+import { facultyData } from "../../lib/dummy-data";
 import {
   BarChart,
   Bar,
@@ -22,7 +22,6 @@ import {
   CheckCircle,
   PieChart,
 } from "lucide-react";
-import Spinner from "../../components/ui/Spinner";
 
 const Card = ({ children, className = "" }) => (
   <div className={`bg-white rounded-xl shadow-md p-6 ${className}`}>
@@ -197,24 +196,7 @@ const NotificationsCard = () => (
 );
 
 const FacultyDashboard = () => {
-  const { user, loading: authLoading } = useAuth();
-  const [loading, setLoading] = useState(true);
-
-  // Simulate data fetching
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 500); // Simulate a 500ms network delay
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (authLoading || loading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Spinner />
-      </div>
-    );
-  }
+  const { user } = useAuth();
 
   return (
     <div className="space-y-6">
