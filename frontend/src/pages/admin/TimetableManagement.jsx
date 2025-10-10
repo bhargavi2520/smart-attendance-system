@@ -20,10 +20,9 @@ const fetchClasses = async () => {
 // Based on the provided timings: 9:00 AM start, 50-min periods, 12:00-12:50 PM lunch, 4:10 PM end.
 const dummyTimetable = {
   Monday: [
-    { time: "9:00 - 9:50", subject: "Data Structures", faculty: "Dr. Alan" },
-    { time: "9:50 - 10:40", subject: "Algorithms", faculty: "Dr. Grace" },
-    { time: "10:40 - 11:30", subject: "Mathematics III", faculty: "Dr. John" },
-    { time: "11:30 - 12:00", subject: "Short Break", faculty: "" },
+    { time: "9:00 - 10:00", subject: "Data Structures", faculty: "Dr. Alan" },
+    { time: "10:00 - 11:00", subject: "Algorithms", faculty: "Dr. Grace" },
+    { time: "11:00 - 12:00", subject: "Mathematics III", faculty: "Dr. John" },
     { time: "12:00 - 12:50", subject: "Lunch Break", faculty: "" },
     {
       time: "12:50 - 1:40",
@@ -35,10 +34,9 @@ const dummyTimetable = {
     { time: "3:20 - 4:10", subject: "DBMS Lab", faculty: "Dr. Codd" },
   ],
   Tuesday: [
-    { time: "9:00 - 9:50", subject: "Algorithms", faculty: "Dr. Grace" },
-    { time: "9:50 - 10:40", subject: "Data Structures", faculty: "Dr. Alan" },
-    { time: "10:40 - 11:30", subject: "DBMS", faculty: "Dr. Codd" },
-    { time: "11:30 - 12:00", subject: "Short Break", faculty: "" },
+    { time: "9:00 - 10:00", subject: "Algorithms", faculty: "Dr. Grace" },
+    { time: "10:00 - 11:00", subject: "Data Structures", faculty: "Dr. Alan" },
+    { time: "11:00 - 12:00", subject: "DBMS", faculty: "Dr. Codd" },
     { time: "12:00 - 12:50", subject: "Lunch Break", faculty: "" },
     { time: "12:50 - 1:40", subject: "Mathematics III", faculty: "Dr. John" },
     { time: "1:40 - 2:30", subject: "Library", faculty: "" },
@@ -46,10 +44,13 @@ const dummyTimetable = {
     { time: "3:20 - 4:10", subject: "Sports", faculty: "Mr. Fit" },
   ],
   Wednesday: [
-    { time: "9:00 - 9:50", subject: "Operating Systems", faculty: "Dr. Linus" },
-    { time: "9:50 - 10:40", subject: "OS Lab", faculty: "Dr. Linus" },
-    { time: "10:40 - 11:30", subject: "Data Structures", faculty: "Dr. Alan" },
-    { time: "11:30 - 12:00", subject: "Short Break", faculty: "" },
+    {
+      time: "9:00 - 10:00",
+      subject: "Operating Systems",
+      faculty: "Dr. Linus",
+    },
+    { time: "10:00 - 11:00", subject: "OS Lab", faculty: "Dr. Linus" },
+    { time: "11:00 - 12:00", subject: "Data Structures", faculty: "Dr. Alan" },
     { time: "12:00 - 12:50", subject: "Lunch Break", faculty: "" },
     { time: "12:50 - 1:40", subject: "Algorithms", faculty: "Dr. Grace" },
     { time: "1:40 - 2:30", subject: "Algo Lab", faculty: "Dr. Grace" },
@@ -58,10 +59,9 @@ const dummyTimetable = {
   ],
   // Assume Thursday and Friday have similar structures
   Thursday: [
-    { time: "9:00 - 9:50", subject: "DBMS", faculty: "Dr. Codd" },
-    { time: "9:50 - 10:40", subject: "DBMS Lab", faculty: "Dr. Codd" },
-    { time: "10:40 - 11:30", subject: "Algorithms", faculty: "Dr. Grace" },
-    { time: "11:30 - 12:00", subject: "Short Break", faculty: "" },
+    { time: "9:00 - 10:00", subject: "DBMS", faculty: "Dr. Codd" },
+    { time: "10:00 - 11:00", subject: "DBMS Lab", faculty: "Dr. Codd" },
+    { time: "11:00 - 12:00", subject: "Algorithms", faculty: "Dr. Grace" },
     { time: "12:00 - 12:50", subject: "Lunch Break", faculty: "" },
     { time: "12:50 - 1:40", subject: "Data Structures", faculty: "Dr. Alan" },
     { time: "1:40 - 2:30", subject: "DS Lab", faculty: "Dr. Alan" },
