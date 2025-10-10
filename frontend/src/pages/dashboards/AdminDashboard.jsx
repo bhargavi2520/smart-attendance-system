@@ -104,13 +104,28 @@ const userRolesData = [
 
 const COLORS = ["#3b82f6", "#10b981", "#8b5cf6"];
 
-const CustomTooltip = ({ active, payload, label }) => {
+const BarChartTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
       <div className="p-3 bg-white rounded-lg shadow-lg border border-gray-200">
         <p className="font-bold text-gray-800">{`${label}`}</p>
         <p className="text-sm text-blue-500">{`Present: ${payload[0].value}`}</p>
         <p className="text-sm text-red-500">{`Absent: ${payload[1].value}`}</p>
+      </div>
+    );
+  }
+  return null;
+};
+
+const PieChartTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="p-3 bg-white rounded-lg shadow-lg border border-gray-200">
+        <p className="font-bold text-gray-800">{data.name}</p>
+        <p className="text-sm" style={{ color: payload[0].color }}>
+          Users: {data.value}
+        </p>
       </div>
     );
   }
@@ -207,7 +222,7 @@ export default function AdminDashboard() {
                     <XAxis dataKey="day" fontSize={12} tickLine={false} />
                     <YAxis fontSize={12} tickLine={false} axisLine={false} />
                     <Tooltip
-                      content={<CustomTooltip />}
+                      content={<BarChartTooltip />}
                       cursor={{ fill: "rgba(243, 244, 246, 0.5)" }}
                     />
                     <Legend iconType="circle" iconSize={10} />
@@ -236,16 +251,16 @@ export default function AdminDashboard() {
               <p className="text-gray-500 mt-2 text-sm">
                 Distribution of roles across the system.
               </p>
-              <div className="mt-4 h-56 flex items-center justify-center">
+              <div className="mt-4 h-56 relative">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
+                    <Tooltip content={<PieChartTooltip />} />
                     <Pie
                       data={userRolesData}
                       cx="50%"
                       cy="50%"
                       innerRadius={60}
                       outerRadius={80}
-                      fill="#8884d8"
                       paddingAngle={5}
                       dataKey="value"
                       nameKey="name">
@@ -253,23 +268,32 @@ export default function AdminDashboard() {
                         <Cell
                           key={`cell-${index}`}
                           fill={COLORS[index % COLORS.length]}
-                          stroke={COLORS[index % COLORS.length]}
+                          stroke="none"
                         />
                       ))}
                     </Pie>
-                    <Tooltip />
                   </PieChart>
                 </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-2xl font-bold text-gray-800">
+                    {userRolesData.reduce((sum, entry) => sum + entry.value, 0)}
+                  </span>
+                  <span className="text-sm text-gray-500">Total Users</span>
+                </div>
               </div>
-              <div className="flex justify-center space-x-4 mt-2">
+              <div className="flex justify-center space-x-6 mt-4">
                 {userRolesData.map((entry, index) => (
-                  <div key={entry.name} className="flex items-center text-sm">
+                  <div
+                    key={entry.name}
+                    className="flex items-center text-sm text-gray-600">
                     <span
-                      className="w-3 h-3 rounded-full mr-2"
-                      style={{
-                        backgroundColor: COLORS[index % COLORS.length],
-                      }}></span>
-                    {entry.name}: {entry.value}
+                      className="w-2.5 h-2.5 rounded-full mr-2"
+                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                    />
+                    <span>
+                      {entry.name}:{" "}
+                      <span className="font-semibold">{entry.value}</span>
+                    </span>
                   </div>
                 ))}
               </div>
