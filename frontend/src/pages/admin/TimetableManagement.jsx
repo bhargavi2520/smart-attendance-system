@@ -1,317 +1,237 @@
-import { useState, useEffect, useCallback } from "react";
-import api from "../../services/api";
-import Spinner from "../../components/ui/Spinner";
+import { useState, useEffect, useRef } from "react";
+import { ChevronDown, Calendar, BookOpen, User, Clock } from "lucide-react";
 
-const daysOfWeek = [
-  "MONDAY",
-  "TUESDAY",
-  "WEDNESDAY",
-  "THURSDAY",
-  "FRIDAY",
-  "SATURDAY",
-];
-const timeSlots = [
-  "09:00:00",
-  "10:00:00",
-  "11:00:00",
-  "12:00:00",
-  "13:00:00",
-  "14:00:00",
-  "15:00:00",
-  "16:00:00",
-];
-
-const formatTime = (timeStr) => {
-  const [hour, minute] = timeStr.split(":");
-  const startHour = parseInt(hour, 10);
-  const endHour = startHour + 1;
-  const formatHour = (h) => (h % 12 === 0 ? 12 : h % 12);
-  const startAmPm = startHour < 12 ? "AM" : "PM";
-  const endAmPm = endHour < 12 || endHour === 24 ? "AM" : "PM";
-  return `${formatHour(startHour)}:${minute} ${startAmPm} - ${formatHour(
-    endHour
-  )}:${minute} ${endAmPm}`;
+// Mock API call and data
+const fetchClasses = async () => {
+  // Simulate network delay
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  // In a real app, this would be: const { data } = await api.get('/api/classes');
+  return {
+    data: {
+      classes: Array.from({ length: 25 }, (_, i) => ({
+        id: i + 1,
+        name: `CSE-A Section ${i + 1}`,
+        year: 2024,
+      })),
+    },
+  };
 };
 
-// --- NEW COMPONENT FOR EDITABLE CELLS ---
-const EditableCell = ({ session, onSave, onCancel, courses, faculty }) => {
-  const [editedSession, setEditedSession] = useState({
-    courseId: session?.courseId || "",
-    facultyId: session?.facultyId || "",
-  });
+// Based on the provided timings: 9:00 AM start, 50-min periods, 12:00-12:50 PM lunch, 4:10 PM end.
+const dummyTimetable = {
+  Monday: [
+    { time: "9:00 - 9:50", subject: "Data Structures", faculty: "Dr. Alan" },
+    { time: "9:50 - 10:40", subject: "Algorithms", faculty: "Dr. Grace" },
+    { time: "10:40 - 11:30", subject: "Mathematics III", faculty: "Dr. John" },
+    { time: "11:30 - 12:00", subject: "Short Break", faculty: "" },
+    { time: "12:00 - 12:50", subject: "Lunch Break", faculty: "" },
+    {
+      time: "12:50 - 1:40",
+      subject: "Operating Systems",
+      faculty: "Dr. Linus",
+    },
+    { time: "1:40 - 2:30", subject: "OS Lab", faculty: "Dr. Linus" },
+    { time: "2:30 - 3:20", subject: "DBMS", faculty: "Dr. Codd" },
+    { time: "3:20 - 4:10", subject: "DBMS Lab", faculty: "Dr. Codd" },
+  ],
+  Tuesday: [
+    { time: "9:00 - 9:50", subject: "Algorithms", faculty: "Dr. Grace" },
+    { time: "9:50 - 10:40", subject: "Data Structures", faculty: "Dr. Alan" },
+    { time: "10:40 - 11:30", subject: "DBMS", faculty: "Dr. Codd" },
+    { time: "11:30 - 12:00", subject: "Short Break", faculty: "" },
+    { time: "12:00 - 12:50", subject: "Lunch Break", faculty: "" },
+    { time: "12:50 - 1:40", subject: "Mathematics III", faculty: "Dr. John" },
+    { time: "1:40 - 2:30", subject: "Library", faculty: "" },
+    { time: "2:30 - 3:20", subject: "Operating Systems", faculty: "Dr. Linus" },
+    { time: "3:20 - 4:10", subject: "Sports", faculty: "Mr. Fit" },
+  ],
+  Wednesday: [
+    { time: "9:00 - 9:50", subject: "Operating Systems", faculty: "Dr. Linus" },
+    { time: "9:50 - 10:40", subject: "OS Lab", faculty: "Dr. Linus" },
+    { time: "10:40 - 11:30", subject: "Data Structures", faculty: "Dr. Alan" },
+    { time: "11:30 - 12:00", subject: "Short Break", faculty: "" },
+    { time: "12:00 - 12:50", subject: "Lunch Break", faculty: "" },
+    { time: "12:50 - 1:40", subject: "Algorithms", faculty: "Dr. Grace" },
+    { time: "1:40 - 2:30", subject: "Algo Lab", faculty: "Dr. Grace" },
+    { time: "2:30 - 3:20", subject: "Mathematics III", faculty: "Dr. John" },
+    { time: "3:20 - 4:10", subject: "DBMS", faculty: "Dr. Codd" },
+  ],
+  // Assume Thursday and Friday have similar structures
+  Thursday: [
+    { time: "9:00 - 9:50", subject: "DBMS", faculty: "Dr. Codd" },
+    { time: "9:50 - 10:40", subject: "DBMS Lab", faculty: "Dr. Codd" },
+    { time: "10:40 - 11:30", subject: "Algorithms", faculty: "Dr. Grace" },
+    { time: "11:30 - 12:00", subject: "Short Break", faculty: "" },
+    { time: "12:00 - 12:50", subject: "Lunch Break", faculty: "" },
+    { time: "12:50 - 1:40", subject: "Data Structures", faculty: "Dr. Alan" },
+    { time: "1:40 - 2:30", subject: "DS Lab", faculty: "Dr. Alan" },
+    { time: "2:30 - 3:20", subject: "Operating Systems", faculty: "Dr. Linus" },
+    { time: "3:20 - 4:10", subject: "Mathematics III", faculty: "Dr. John" },
+  ],
+  Friday: [
+    {
+      time: "9:00 - 4:10",
+      subject: "Industrial Visit",
+      faculty: "Coordinator",
+    },
+  ],
+};
 
-  const handleSave = () => {
-    onSave(editedSession);
-  };
+const CustomDropdown = ({ items, selected, onSelect, placeholder }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <div className="flex flex-col space-y-2 p-1">
-      <select
-        value={editedSession.courseId}
-        onChange={(e) =>
-          setEditedSession({ ...editedSession, courseId: e.target.value })
-        }
-        className="w-full p-1 border border-gray-300 rounded-md text-sm"
-      >
-        <option value="">Select Course</option>
-        {courses.map((course) => (
-          <option key={course.id} value={course.id}>
-            {course.name}
-          </option>
-        ))}
-      </select>
-      <select
-        value={editedSession.facultyId}
-        onChange={(e) =>
-          setEditedSession({ ...editedSession, facultyId: e.target.value })
-        }
-        className="w-full p-1 border border-gray-300 rounded-md text-sm"
-      >
-        <option value="">Select Faculty</option>
-        {faculty.map((f) => (
-          <option key={f.id} value={f.id}>
-            {f.name}
-          </option>
-        ))}
-      </select>
-      <div className="flex justify-end space-x-2 mt-1">
-        <button
-          onClick={handleSave}
-          className="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600"
-        >
-          Save
-        </button>
-        <button
-          onClick={onCancel}
-          className="px-2 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600"
-        >
-          Cancel
-        </button>
-      </div>
+    <div className="relative w-full md:w-72" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm text-left focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+        <span className="truncate">
+          {selected ? selected.name : placeholder}
+        </span>
+        <ChevronDown
+          className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-xl">
+          <ul className="py-1 max-h-60 overflow-y-auto">
+            {items.map((item) => (
+              <li
+                key={item.id}
+                onClick={() => {
+                  onSelect(item);
+                  setIsOpen(false);
+                }}
+                className="px-4 py-2 text-gray-700 hover:bg-blue-50 cursor-pointer">
+                {item.name}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
 
 export default function TimetableManagement() {
   const [classes, setClasses] = useState([]);
-  const [courses, setCourses] = useState([]);
-  const [faculty, setFaculty] = useState([]);
-  const [selectedClassId, setSelectedClassId] = useState("");
-  const [timetable, setTimetable] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
-  const [editingCell, setEditingCell] = useState(null); // Tracks which cell is being edited, e.g., {time, day}
+  const [selectedClass, setSelectedClass] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Fetch all static data (classes, courses, faculty) on component mount
   useEffect(() => {
-    const fetchInitialData = async () => {
+    const getClasses = async () => {
       try {
-        const [classesRes, coursesRes, facultyRes] = await Promise.all([
-          api.get("/api/classes"),
-          api.get("/api/courses"),
-          api.get("/api/users?role=FACULTY"),
-        ]);
-        setClasses(classesRes.data || []);
-        setCourses(coursesRes.data || []);
-        setFaculty(facultyRes.data.users || []); // The user API returns { users: [...] }
-      } catch (error) {
-        console.error("Failed to fetch initial data:", error);
+        setLoading(true);
+        const response = await fetchClasses();
+        setClasses(response.data.classes || []);
+      } catch (err) {
+        setError("Failed to fetch classes.");
+        console.error(err);
       } finally {
-        setInitialLoading(false);
+        setLoading(false);
       }
     };
-    fetchInitialData();
+    getClasses();
   }, []);
-
-  // Fetch the timetable when a class is selected (using useCallback)
-  const fetchTimetable = useCallback(async () => {
-    if (!selectedClassId) {
-      setTimetable({});
-      return;
-    }
-    setLoading(true);
-    try {
-      const { data } = await api.get(
-        `/api/timetables/class/${selectedClassId}`
-      );
-      const processedTimetable = {};
-      for (const entry of data) {
-        const time = entry.startTime;
-        const day = entry.dayOfWeek;
-
-        if (!processedTimetable[time]) {
-          processedTimetable[time] = {};
-        }
-        // Store IDs for editing and names for display
-        processedTimetable[time][day] = {
-          courseName: entry.course?.name,
-          facultyName: entry.faculty?.name,
-          courseId: entry.courseId,
-          facultyId: entry.facultyId,
-        };
-      }
-      setTimetable(processedTimetable);
-    } catch (error) {
-      console.error("Failed to fetch timetable:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedClassId]);
-
-  useEffect(() => {
-    fetchTimetable();
-  }, [fetchTimetable]);
-
-  // --- NEW HANDLER FOR SAVING A CELL ---
-  const handleSaveCell = async (time, day, updatedSession) => {
-    const payload = {
-      classId: selectedClassId,
-      startTime: time,
-      dayOfWeek: day,
-      courseId: updatedSession.courseId || null,
-      facultyId: updatedSession.facultyId || null,
-    };
-    try {
-      await api.post("/api/timetables/entry", payload);
-      setEditingCell(null); // Exit edit mode
-      fetchTimetable(); // Refresh the timetable data
-    } catch (error) {
-      console.error("Failed to save timetable entry:", error);
-      // You might want to show an error toast here
-    }
-  };
 
   return (
     <div className="p-4 md:p-8 bg-gray-50 min-h-full">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Timetable Management
-        </h1>
-        <p className="mt-1 text-gray-600">
-          Select a class to view or edit its timetable.
-        </p>
-      </div>
-
-      <div className="mb-6 max-w-md">
-        <label
-          htmlFor="class-select"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Select Class
-        </label>
-        <select
-          id="class-select"
-          value={selectedClassId}
-          onChange={(e) => setSelectedClassId(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
-          disabled={initialLoading}
-        >
-          <option value="">
-            {initialLoading ? "Loading..." : "Select a Class"}
-          </option>
-          {classes.map((cls) => (
-            <option key={cls.id} value={cls.id}>
-              {cls.department?.name} - {cls.name} (Year: {cls.year})
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <Spinner />
+      <header className="flex flex-col md:flex-row justify-between md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Timetable Management
+          </h1>
+          <p className="text-gray-600 mt-1">
+            View, create, or update class timetables.
+          </p>
         </div>
-      ) : (
-        selectedClassId && (
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
-                    Time
-                  </th>
-                  {daysOfWeek.map((day) => (
-                    <th
-                      key={day}
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+        <div className="flex-shrink-0">
+          {loading ? (
+            <div className="h-12 w-72 bg-gray-200 rounded-lg animate-pulse" />
+          ) : (
+            <CustomDropdown
+              items={classes}
+              selected={selectedClass}
+              onSelect={setSelectedClass}
+              placeholder="Select a class to view"
+            />
+          )}
+        </div>
+      </header>
+
+      {error && <p className="text-center text-red-500">{error}</p>}
+
+      <main className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        {selectedClass ? (
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 flex items-center">
+              <BookOpen className="w-6 h-6 mr-3 text-blue-500" />
+              Timetable for {selectedClass.name}
+            </h2>
+            <div className="mt-6 overflow-x-auto">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-1 min-w-[800px]">
+                {Object.entries(dummyTimetable).map(([day, periods]) => (
+                  <div key={day} className="flex flex-col">
+                    <div className="p-3 bg-gray-100 text-gray-800 font-semibold text-center rounded-t-lg">
                       {day}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {timeSlots.map((time) => {
-                  if (time === "12:00:00") {
-                    return (
-                      <tr key="lunch" className="bg-gray-100">
-                        <td
-                          colSpan={daysOfWeek.length + 1}
-                          className="px-6 py-4 text-center font-semibold text-gray-700"
-                        >
-                          Lunch Break (12:00 PM - 01:00 PM)
-                        </td>
-                      </tr>
-                    );
-                  }
-                  return (
-                    <tr key={time}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {formatTime(time)}
-                      </td>
-                      {daysOfWeek.map((day) => {
-                        const session = timetable[time]?.[day];
-                        const isEditing =
-                          editingCell?.time === time &&
-                          editingCell?.day === day;
-                        return (
-                          <td
-                            key={`${day}-${time}`}
-                            className="px-2 py-2 whitespace-nowrap text-sm align-top"
-                          >
-                            {isEditing ? (
-                              <EditableCell
-                                session={session}
-                                courses={courses}
-                                faculty={faculty}
-                                onSave={(updated) =>
-                                  handleSaveCell(time, day, updated)
-                                }
-                                onCancel={() => setEditingCell(null)}
-                              />
-                            ) : (
-                              <div className="relative group p-2 min-h-[60px]">
-                                {session ? (
-                                  <div>
-                                    <p className="font-semibold text-gray-800">
-                                      {session.courseName}
-                                    </p>
-                                    <p className="text-gray-500">
-                                      {session.facultyName}
-                                    </p>
-                                  </div>
-                                ) : (
-                                  <span className="text-gray-400">Free</span>
-                                )}
-                                <button
-                                  onClick={() => setEditingCell({ time, day })}
-                                  className="absolute top-1 right-1 p-1 bg-gray-200 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  ✏️
-                                </button>
-                              </div>
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                    </div>
+                    <div className="flex-grow space-y-1 bg-gray-50 p-2 rounded-b-lg">
+                      {periods.map((period, index) => (
+                        <div
+                          key={index}
+                          className={`p-3 rounded-md ${
+                            period.subject.toLowerCase().includes("break")
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-blue-50 text-blue-900"
+                          }`}>
+                          <p className="font-bold text-sm truncate">
+                            {period.subject}
+                          </p>
+                          {period.faculty && (
+                            <p className="text-xs flex items-center mt-1 opacity-80">
+                              <User className="w-3 h-3 mr-1.5" />
+                              {period.faculty}
+                            </p>
+                          )}
+                          <p className="text-xs flex items-center mt-1 opacity-80">
+                            <Clock className="w-3 h-3 mr-1.5" />
+                            {period.time}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        )
-      )}
+        ) : (
+          <div className="text-center py-16">
+            <Calendar className="w-16 h-16 mx-auto text-gray-300" />
+            <h3 className="mt-4 text-lg font-semibold text-gray-700">
+              No Class Selected
+            </h3>
+            <p className="text-gray-500 mt-1">
+              Please select a class from the dropdown to view its timetable.
+            </p>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
