@@ -76,17 +76,17 @@ const Header = ({ setSidebarOpen = () => {} }) => {
             </h1>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {/* Role Switcher */}
             {user && user.roles.length > 1 ? (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center space-x-2 rounded-md p-2 border border-gray-300 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="flex items-center space-x-2 rounded-lg p-2 border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
                   title="Switch Role">
                   <Repeat className="h-4 w-4" />
-                  <span className="capitalize">
-                    {activeRole || "Switch Role"}
+                  <span className="capitalize text-xs md:text-sm font-medium">
+                    {activeRole}
                   </span>
                 </button>
 
@@ -96,7 +96,7 @@ const Header = ({ setSidebarOpen = () => {} }) => {
                       className="py-1"
                       role="menu"
                       aria-orientation="vertical">
-                      <p className="px-4 pt-2 pb-1 text-xs text-gray-500">
+                      <p className="px-4 pt-2 pb-1 text-xs font-medium text-gray-400">
                         Switch to:
                       </p>
                       {otherRoles.map((role) => (
@@ -104,7 +104,8 @@ const Header = ({ setSidebarOpen = () => {} }) => {
                           key={role}
                           onClick={() => handleRoleSelect(role)}
                           className="w-full text-left block px-4 py-2 text-sm text-gray-700 capitalize hover:bg-gray-100 hover:text-gray-900"
-                          role="menuitem">
+                          role="menuitem"
+                          title={`Switch to ${role} role`}>
                           {role}
                         </button>
                       ))}
@@ -119,8 +120,10 @@ const Header = ({ setSidebarOpen = () => {} }) => {
             )}
 
             {/* User Name */}
-            <div className="text-left">
-              <p className="text-lg font-bold text-gray-900">{user?.name}</p>
+            <div className="hidden sm:block text-right">
+              <p className="text-sm font-semibold text-gray-800">
+                {user?.name}
+              </p>
             </div>
 
             {/* Logout Button */}
