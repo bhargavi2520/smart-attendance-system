@@ -11,6 +11,19 @@ import {
   Activity,
   ChevronRight,
 } from "lucide-react";
+import {
+  ResponsiveContainer,
+  BarChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 
 const StatCard = ({ title, value, icon, color }) => (
   <div className="bg-white p-6 rounded-xl shadow-sm flex items-center space-x-4">
@@ -71,6 +84,38 @@ const recentActivities = [
     time: "2 days ago",
   },
 ];
+
+// Mock data for the attendance chart
+const attendanceData = [
+  { day: "Mon", Present: 430, Absent: 50 },
+  { day: "Tue", Present: 450, Absent: 30 },
+  { day: "Wed", Present: 465, Absent: 15 },
+  { day: "Thu", Present: 440, Absent: 40 },
+  { day: "Fri", Present: 470, Absent: 10 },
+  { day: "Sat", Present: 410, Absent: 70 },
+];
+
+// Mock data for the user roles pie chart
+const userRolesData = [
+  { name: "Students", value: 480 },
+  { name: "Faculty", value: 35 },
+  { name: "Admins", value: 2 },
+];
+
+const COLORS = ["#3b82f6", "#10b981", "#8b5cf6"];
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="p-3 bg-white rounded-lg shadow-lg border border-gray-200">
+        <p className="font-bold text-gray-800">{`${label}`}</p>
+        <p className="text-sm text-blue-500">{`Present: ${payload[0].value}`}</p>
+        <p className="text-sm text-red-500">{`Absent: ${payload[1].value}`}</p>
+      </div>
+    );
+  }
+  return null;
+};
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -144,8 +189,42 @@ export default function AdminDashboard() {
                 Chart showing overall attendance percentage for the last 30
                 days.
               </p>
-              <div className="mt-4 h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-                <p className="text-gray-400">Attendance Chart Placeholder</p>
+              <div className="mt-6 h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={attendanceData}
+                    margin={{
+                      top: 5,
+                      right: 20,
+                      left: -10,
+                      bottom: 5,
+                    }}>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#e5e7eb"
+                      vertical={false}
+                    />
+                    <XAxis dataKey="day" fontSize={12} tickLine={false} />
+                    <YAxis fontSize={12} tickLine={false} axisLine={false} />
+                    <Tooltip
+                      content={<CustomTooltip />}
+                      cursor={{ fill: "rgba(243, 244, 246, 0.5)" }}
+                    />
+                    <Legend iconType="circle" iconSize={10} />
+                    <Bar
+                      dataKey="Present"
+                      fill="#3b82f6"
+                      name="Present"
+                      radius={[4, 4, 0, 0]}
+                    />
+                    <Bar
+                      dataKey="Absent"
+                      fill="#ef4444"
+                      name="Absent"
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
 
@@ -157,8 +236,42 @@ export default function AdminDashboard() {
               <p className="text-gray-500 mt-2 text-sm">
                 Distribution of roles across the system.
               </p>
-              <div className="mt-4 h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                <p className="text-gray-400">User Roles Pie Chart</p>
+              <div className="mt-4 h-56 flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={userRolesData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      paddingAngle={5}
+                      dataKey="value"
+                      nameKey="name">
+                      {userRolesData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                          stroke={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex justify-center space-x-4 mt-2">
+                {userRolesData.map((entry, index) => (
+                  <div key={entry.name} className="flex items-center text-sm">
+                    <span
+                      className="w-3 h-3 rounded-full mr-2"
+                      style={{
+                        backgroundColor: COLORS[index % COLORS.length],
+                      }}></span>
+                    {entry.name}: {entry.value}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
