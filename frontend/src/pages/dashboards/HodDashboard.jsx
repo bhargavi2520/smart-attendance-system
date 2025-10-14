@@ -78,7 +78,7 @@ const mockData = {
   ],
 };
 
-const HODDashboard = () => {
+const HOdDashboard = () => {
   const topClasses = mockData.classPerformance.filter((c) => c.type === "top");
   const bottomClasses = mockData.classPerformance.filter(
     (c) => c.type === "bottom"
@@ -300,4 +300,4 @@ const HODDashboard = () => {
   );
 };
 
-export default HODDashboard;
+export default HodDashboard;
