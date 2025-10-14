@@ -7,6 +7,7 @@ const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
+    // Reduced outer padding/background so content aligns closer to screen edges
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
@@ -17,8 +18,8 @@ const MainLayout = () => {
         <Header setSidebarOpen={setSidebarOpen} />
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto bg-gray-50">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="flex-1 overflow-y-auto bg-transparent">
+          <div className="w-full px-2 sm:px-4 md:px-6 py-4 md:py-6">
             <Outlet />
           </div>
         </main>

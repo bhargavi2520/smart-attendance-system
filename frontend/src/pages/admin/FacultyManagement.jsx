@@ -17,8 +17,7 @@ const RoleBadge = ({ role }) => (
   <span
     className={`px-2 py-1 text-xs font-semibold rounded-full ${
       roleColorMap[role] || "bg-gray-100 text-gray-800"
-    }`}
-  >
+    }`}>
     {role.replace(/_/g, " ")}
   </span>
 );
@@ -136,7 +135,7 @@ export default function FacultyManagement() {
     );
 
   return (
-    <div className="p-4 md:p-8 bg-gray-50 min-h-full">
+    <div className="p-2 md:p-4 bg-gray-50 min-h-full">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">
           Faculty & Role Management
@@ -209,14 +208,12 @@ export default function FacultyManagement() {
                       <button
                         onClick={() => setSelectedUser(user)}
                         className="text-blue-600 hover:text-blue-900"
-                        title="Edit Roles"
-                      >
+                        title="Edit Roles">
                         <Edit3 size={18} />
                       </button>
                       <button
                         className="text-red-600 hover:text-red-900"
-                        title="Delete User"
-                      >
+                        title="Delete User">
                         <Trash2 size={18} />
                       </button>
                     </td>
@@ -266,8 +263,7 @@ export default function FacultyManagement() {
                   value={newFacultyDept}
                   onChange={(e) => setNewFacultyDept(e.target.value)}
                   required
-                  className="mt-1 w-full p-2 border rounded-md"
-                >
+                  className="mt-1 w-full p-2 border rounded-md">
                   <option value="">Select Department</option>
                   {departments.map((dept) => (
                     <option key={dept.id} value={dept.id}>
@@ -278,8 +274,7 @@ export default function FacultyManagement() {
               </div>
               <button
                 type="submit"
-                className="w-full flex justify-center items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-              >
+                className="w-full flex justify-center items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                 <UserPlus size={18} className="mr-2" />
                 Add Faculty
               </button>
@@ -301,8 +296,7 @@ export default function FacultyManagement() {
                       users.find((u) => u.id === parseInt(e.target.value))
                     )
                   }
-                  className="mt-1 w-full p-2 border rounded-md"
-                >
+                  className="mt-1 w-full p-2 border rounded-md">
                   <option value="">-- Select a user --</option>
                   {users.map((user) => (
                     <option key={user.id} value={user.id}>
@@ -328,8 +322,7 @@ export default function FacultyManagement() {
                         />
                         <label
                           htmlFor={`role-${role.id}`}
-                          className="ml-2 block text-sm text-gray-900"
-                        >
+                          className="ml-2 block text-sm text-gray-900">
                           {role.name.replace(/_/g, " ")}
                         </label>
                       </div>
@@ -340,8 +333,7 @@ export default function FacultyManagement() {
               <button
                 type="submit"
                 disabled={!selectedUser}
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
-              >
+                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400">
                 Update Roles
               </button>
             </form>

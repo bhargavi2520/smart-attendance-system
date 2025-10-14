@@ -75,7 +75,7 @@ export default function FacultySettingsPage() {
   };
 
   return (
-    <div className="p-4 md:p-8 bg-gray-50 min-h-full">
+    <div className="p-2 md:p-4 bg-gray-50 min-h-full">
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
         <p className="text-gray-600 mt-1">

@@ -150,7 +150,7 @@ export default function TimetableManagement() {
   }, []);
 
   return (
-    <div className="p-4 md:p-8 bg-gray-50 min-h-full">
+    <div className="p-2 md:p-4 bg-gray-50 min-h-full">
       <header className="flex flex-col md:flex-row justify-between md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">

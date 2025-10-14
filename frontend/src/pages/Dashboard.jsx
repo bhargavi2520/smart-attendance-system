@@ -14,12 +14,8 @@ const Dashboard = () => {
   const { user, activeRole, loading } = useAuth();
 
   if (loading || !user) {
-    // If we are stuck here, the auth context is not providing the user object yet.
-    return (
-      <div className="flex items-center justify-center h-full pt-20">
-        <Spinner />
-      </div>
-    );
+    // If we are stuck here, show centered spinner (Spinner provides responsive min-height)
+    return <Spinner />;
   }
 
   if (user.roles.length > 1 && !activeRole) {

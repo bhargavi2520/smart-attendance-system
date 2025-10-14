@@ -14,8 +14,8 @@ const Layout = () => {
       {/* This div will contain the header and the main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header setSidebarOpen={setSidebarOpen} />
-        {/* The main content area is now scrollable */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
+        {/* The main content area is now scrollable. Reduced padding to bring content closer to edges */}
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-2 md:p-4">
           <Suspense
             fallback={
               <div className="flex h-full items-center justify-center">
