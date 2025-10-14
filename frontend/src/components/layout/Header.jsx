@@ -10,7 +10,7 @@ const getPageTitle = (pathname) => {
 };
 
 const Header = ({ setSidebarOpen = () => {} }) => {
-  const { user, logout, setActiveRole } = useAuth();
+  const { user, activeRole: ctxActiveRole, logout, setActiveRole } = useAuth();
   const location = useLocation();
   const pageTitle = getPageTitle(location.pathname);
 
@@ -18,11 +18,12 @@ const Header = ({ setSidebarOpen = () => {} }) => {
   const dropdownRef = useRef(null);
 
   // this ensures UI updates instantly when switching role
-  const [activeRole, setLocalActiveRole] = useState(user?.activeRole || "");
+  const [activeRole, setLocalActiveRole] = useState(ctxActiveRole || "");
 
   useEffect(() => {
-    setLocalActiveRole(user?.activeRole || "");
-  }, [user?.activeRole]);
+    // keep local state in sync with context; if context role is missing show empty
+    setLocalActiveRole(ctxActiveRole || "");
+  }, [ctxActiveRole]);
 
   const handleRoleSelect = (role) => {
     if (setActiveRole) {
@@ -76,7 +77,7 @@ const Header = ({ setSidebarOpen = () => {} }) => {
                   title="Switch Role">
                   <Repeat className="h-4 w-4" />
                   <span className="capitalize text-xs md:text-sm font-medium">
-                    {activeRole}
+                    {activeRole || pageTitle}
                   </span>
                 </button>
 

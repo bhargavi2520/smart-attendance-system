@@ -60,10 +60,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
             icon: <LayoutDashboard />,
           },
           ...facultyLinks,
+          // UPDATED: HOD-specific links for more detailed views
           {
-            to: "/reports/department",
-            text: "Dept. Report",
+            to: "/hod/reports",
+            text: "Department Reports",
             icon: <BarChart3 />,
+          },
+          {
+            to: "/hod/faculty-status",
+            text: "Faculty Status",
+            icon: <UserCheck />,
           },
           settings,
         ];
