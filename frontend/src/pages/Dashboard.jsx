@@ -10,6 +10,7 @@ import FacultyDashboard from "./dashboards/FacultyDashboard";
 import AdminDashboard from "./dashboards/AdminDashboard";
 import InchargeDashboard from "./dashboards/InchargeDashboard";
 import PrincipalDashboard from "./dashboards/PrincipalDashboard";
+import HOdDashboard from "./dashboards/HOdDashboard";
 
 const Dashboard = () => {
   const { user, activeRole, loading } = useAuth();
@@ -30,7 +31,7 @@ const Dashboard = () => {
     case "faculty":
       return <FacultyDashboard />;
     case "hod":
-      return <HODDashboard />;
+      return <HOdDashboard />;
     case "incharge":
       return <InchargeDashboard />;
     case "principal":
