@@ -104,6 +104,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           {
             to: "/reports/college",
             text: "College Report",
+          },
+          {
             to: "/principal/reports/attendance",
             text: "Attendance Reports",
             icon: <BarChart3 />,

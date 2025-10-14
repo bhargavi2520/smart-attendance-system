@@ -8,7 +8,6 @@ import { Navigate } from "react-router-dom";
 import StudentDashboard from "./dashboards/StudentDashboard";
 import FacultyDashboard from "./dashboards/FacultyDashboard";
 import AdminDashboard from "./dashboards/AdminDashboard";
-import HODDashboard from "./dashboards/HODDashboard";
 import InchargeDashboard from "./dashboards/InchargeDashboard";
 import PrincipalDashboard from "./dashboards/PrincipalDashboard";
 
