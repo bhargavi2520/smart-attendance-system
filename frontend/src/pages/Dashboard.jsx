@@ -9,6 +9,7 @@ import StudentDashboard from "./dashboards/StudentDashboard";
 import FacultyDashboard from "./dashboards/FacultyDashboard";
 import AdminDashboard from "./dashboards/AdminDashboard";
 import HODDashboard from "./dashboards/HODDashboard";
+import InchargeDashboard from "./dashboards/InchargeDashboard";
 import PrincipalDashboard from "./dashboards/PrincipalDashboard";
 
 const Dashboard = () => {
@@ -31,6 +32,8 @@ const Dashboard = () => {
       return <FacultyDashboard />;
     case "hod":
       return <HODDashboard />;
+    case "incharge":
+      return <InchargeDashboard />;
     case "principal":
       return <PrincipalDashboard />;
     case "admin":

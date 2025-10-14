@@ -10,7 +10,7 @@ import {
   CalendarClock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
+import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 const StatCard = ({ title, value, icon, color }) => (
   <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
@@ -77,6 +77,7 @@ const InchargeDashboard = () => {
             Mark Today's Attendance
           </Link>
         </div>
+
         <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard
             title="Total Strength"
@@ -133,8 +134,8 @@ const InchargeDashboard = () => {
 
           <div className="bg-white p-6 rounded-xl shadow-sm border">
             <h2 className="text-lg font-semibold text-gray-800 flex items-center mb-4">
-              <AlertTriangle className="w-5 h-5 mr-2 text-yellow-600" />
-              Low Attendance Alerts
+              <AlertTriangle className="w-5 h-5 mr-2 text-yellow-600" /> Low
+              Attendance Alerts
             </h2>
             <ul className="space-y-3">
               {mockData.lowAttendanceStudents.map((student) => (

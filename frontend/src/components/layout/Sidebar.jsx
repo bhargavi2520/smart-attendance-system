@@ -9,6 +9,7 @@ import {
   UserCheck,
   Calendar,
   BookOpen,
+  ClipboardCheck,
   X,
 } from "lucide-react";
 import useAuth from "../../hooks/useAuth";
@@ -50,6 +51,25 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
             icon: <LayoutDashboard />,
           },
           ...facultyLinks,
+          settings,
+        ];
+      case "incharge":
+        return [
+          {
+            to: "/incharge/dashboard",
+            text: "Dashboard",
+            icon: <LayoutDashboard />,
+          },
+          {
+            to: "/attendance",
+            text: "Mark Attendance",
+            icon: <ClipboardCheck />,
+          },
+          {
+            to: "/incharge/reports",
+            text: "Class Reports",
+            icon: <BarChart3 />,
+          },
           settings,
         ];
       case "hod":
