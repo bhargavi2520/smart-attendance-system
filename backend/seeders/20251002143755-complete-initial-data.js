@@ -276,7 +276,7 @@ module.exports = {
       {
         id: 1002,
         name: "Ms Pandu",
-        email: "bhargavi5052@gmail.com",
+        email: "admin@test.com",
         password: hashedPassword,
         created_at: now,
         updated_at: now,
@@ -292,7 +292,7 @@ module.exports = {
       {
         id: userIdCounter++,
         name: "Site Admin",
-        email: "admin@test.com",
+        email: "admin1@test.com",
         password: hashedPassword,
         created_at: now,
         updated_at: now,
