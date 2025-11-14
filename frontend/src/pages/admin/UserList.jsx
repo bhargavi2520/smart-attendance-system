@@ -14,14 +14,11 @@ export default function UserList() {
     const fetchUsers = async () => {
       if (user) {
         try {
-          // 1. Fixed the address to start with "/api"
           const { data } = await api.get("/api/users");
-
-          // 2. Used the correct "data" variable
-          setUsers(data.users || []);
+          setUsers(Array.isArray(data) ? data : data.users || []);
         } catch (err) {
           setError("Failed to fetch users.");
-          console.error("Error details:", err); // Logs the actual error to the console
+          console.error("Error details:", err);
         } finally {
           setLoading(false);
         }
@@ -35,7 +32,7 @@ export default function UserList() {
   const deleteHandler = async (id) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
-        await api.delete(`/users/${id}`);
+        await api.delete(`/api/users/${id}`); // Fixed: Added /api
         setUsers(users.filter((user) => user.id !== id));
       } catch (err) {
         alert("Failed to delete user.");
@@ -60,22 +57,16 @@ export default function UserList() {
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
               Name
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
               Email
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Roles
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Role
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Roll Number
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Department
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
               Actions
             </th>
           </tr>
@@ -85,15 +76,7 @@ export default function UserList() {
             <tr key={user.id}>
               <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
               <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {user.roles?.map((role) => role.name).join(", ")}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {user.studentProfile?.rollNumber || "N/A"}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {user.facultyProfile?.department || "N/A"}
-              </td>
+              <td className="px-6 py-4 whitespace-nowrap">{user.role}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <Link
                   to={`/admin/users/edit/${user.id}`}

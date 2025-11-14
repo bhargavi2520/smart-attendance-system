@@ -4,6 +4,7 @@ const { protect, authorize } = require("../middleware/authMiddleware");
 const {
   getDepartmentStats,
   getInstitutionStats,
+  getAdminDashboardStats, // <-- ADDED IMPORT
 } = require("../controllers/analyticsController");
 
 // HOD route
@@ -20,6 +21,15 @@ router.get(
   protect,
   authorize("PRINCIPAL"),
   getInstitutionStats
+);
+
+// Admin Dashboard Route
+// Allows ADMIN and PRINCIPAL to view the main stats
+router.get(
+  "/admin/stats",
+  protect,
+  authorize("ADMIN", "PRINCIPAL"),
+  getAdminDashboardStats
 );
 
 module.exports = router;

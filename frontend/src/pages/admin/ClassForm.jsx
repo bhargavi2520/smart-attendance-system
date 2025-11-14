@@ -1,4 +1,3 @@
-// src/pages/admin/ClassForm.jsx
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../../services/api";
@@ -6,7 +5,7 @@ import Spinner from "../../components/ui/Spinner";
 
 export default function ClassForm() {
   const [name, setName] = useState("");
-  const [departmentId, setDepartmentId] = useState("");
+  const [departmentId, setDepartmentId] = useState(""); // Storing department name string in 'department' field on Course model if relation doesn't exist
   const [year, setYear] = useState(new Date().getFullYear());
   const [inchargeId, setInchargeId] = useState("");
 
@@ -19,25 +18,27 @@ export default function ClassForm() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch departments and faculty for the dropdowns
-        const [deptsRes, facultyRes] = await Promise.all([
+        const [deptsRes, usersRes] = await Promise.all([
           api.get("/api/departments"),
-          api.get("/api/users?role=FACULTY"), // Assuming an endpoint to get users by role
+          api.get("/api/users"),
         ]);
         setDepartments(deptsRes.data);
-        setFaculty(facultyRes.data.users);
+
+        // Filter users to get only faculty
+        const allUsers = Array.isArray(usersRes.data)
+          ? usersRes.data
+          : usersRes.data.users || [];
+        setFaculty(allUsers.filter((u) => u.role === "FACULTY"));
 
         if (id) {
-          // If editing, fetch the class data
           const { data: classData } = await api.get(`/api/classes/${id}`);
-          setName(classData.name);
-          setDepartmentId(classData.departmentId);
-          setYear(classData.year);
-          setInchargeId(classData.inchargeId || "");
+          setName(classData.name || classData.courseName); // Handle model field name differences
+          setDepartmentId(classData.department || "");
+          // setYear(classData.year); // Enable if year is in your schema
+          setInchargeId(classData.facultyId || "");
         }
       } catch (error) {
         console.error("Failed to fetch form data", error);
-        alert("Failed to load necessary data. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -47,11 +48,11 @@ export default function ClassForm() {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    // Adjust keys to match your 'Course' or 'Class' model
     const classData = {
-      name,
-      departmentId,
-      year,
-      inchargeId: inchargeId || null,
+      courseName: name, // or 'name' depending on model
+      department: departmentId, // storing department name directly if no relation
+      facultyId: inchargeId || null,
     };
 
     try {
@@ -62,7 +63,7 @@ export default function ClassForm() {
       }
       navigate("/admin/classes");
     } catch (error) {
-      alert("Failed to save class. Check console for details.");
+      alert("Failed to save class.");
       console.error(error);
     }
   };
@@ -83,7 +84,7 @@ export default function ClassForm() {
             onChange={(e) => setName(e.target.value)}
             required
             className="w-full border rounded p-2"
-            placeholder="e.g., Section A"
+            placeholder="e.g., CSE-A"
           />
         </div>
 
@@ -97,7 +98,7 @@ export default function ClassForm() {
           >
             <option value="">-- Select Department --</option>
             {departments.map((dept) => (
-              <option key={dept.id} value={dept.id}>
+              <option key={dept.id} value={dept.name}>
                 {dept.name}
               </option>
             ))}
@@ -105,19 +106,8 @@ export default function ClassForm() {
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700">Year</label>
-          <input
-            type="number"
-            value={year}
-            onChange={(e) => setYear(parseInt(e.target.value))}
-            required
-            className="w-full border rounded p-2"
-          />
-        </div>
-
-        <div className="mb-4">
           <label className="block text-gray-700">
-            Class In-Charge (Optional)
+            Class In-Charge (Faculty)
           </label>
           <select
             value={inchargeId}

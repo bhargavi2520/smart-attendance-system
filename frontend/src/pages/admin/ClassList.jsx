@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
 import Spinner from "../../components/ui/Spinner";
-import { Edit, Trash2, PlusCircle, Search } from "lucide-react";
+import { PlusCircle, Search } from "lucide-react";
 
 export default function ClassList() {
   const [classes, setClasses] = useState([]);
@@ -13,7 +13,7 @@ export default function ClassList() {
     setLoading(true);
     try {
       const { data } = await api.get("/api/classes");
-      setClasses(data);
+      setClasses(Array.isArray(data) ? data : data.classes || []);
     } catch (error) {
       console.error("Failed to fetch classes", error);
     } finally {
@@ -26,17 +26,12 @@ export default function ClassList() {
   }, []);
 
   const deleteHandler = async (id) => {
-    if (
-      window.confirm(
-        "Are you sure you want to delete this class? This action cannot be undone."
-      )
-    ) {
+    if (window.confirm("Are you sure you want to delete this class?")) {
       try {
         await api.delete(`/api/classes/${id}`);
         setClasses((prevClasses) => prevClasses.filter((c) => c.id !== id));
       } catch (err) {
         alert("Failed to delete class.");
-        console.error(err);
       }
     }
   };
@@ -44,13 +39,8 @@ export default function ClassList() {
   const filteredClasses = classes.filter((cls) => {
     const name = cls.name?.toLowerCase() || "";
     const department = cls.department?.name?.toLowerCase() || "";
-    const inCharge = cls.inCharge?.name?.toLowerCase() || "";
     const query = searchTerm.toLowerCase();
-    return (
-      name.includes(query) ||
-      department.includes(query) ||
-      inCharge.includes(query)
-    );
+    return name.includes(query) || department.includes(query);
   });
 
   if (loading)
@@ -68,8 +58,7 @@ export default function ClassList() {
           to="/admin/classes/add"
           className="flex items-center justify-center bg-blue-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-700 transition-colors w-full md:w-auto"
         >
-          <PlusCircle className="h-5 w-5 mr-2" />
-          Add Class
+          <PlusCircle className="h-5 w-5 mr-2" /> Add Class
         </Link>
       </div>
 
@@ -80,8 +69,8 @@ export default function ClassList() {
         />
         <input
           type="text"
-          placeholder="Search classes by name, department, or in-charge..."
-          className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+          placeholder="Search classes..."
+          className="w-full p-3 pl-10 border border-gray-300 rounded-lg"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -91,34 +80,16 @@ export default function ClassList() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Class Name
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Department
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Year
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                In-Charge
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Actions
               </th>
             </tr>
@@ -126,17 +97,14 @@ export default function ClassList() {
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredClasses.map((cls) => (
               <tr key={cls.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
                   {cls.name}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                   {cls.department?.name || "N/A"}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {cls.year}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {cls.inCharge?.name || "Not Assigned"}
+                <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                  {cls.year || "N/A"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-4">
                   <Link
@@ -156,16 +124,6 @@ export default function ClassList() {
             ))}
           </tbody>
         </table>
-        {filteredClasses.length === 0 && !loading && (
-          <div className="text-center p-12">
-            <h3 className="text-lg font-semibold text-gray-700">
-              No Matching Classes Found
-            </h3>
-            <p className="text-gray-500 mt-1">
-              Try adjusting your search term or add a new class.
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

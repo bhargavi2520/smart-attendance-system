@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 import Spinner from "../../components/ui/Spinner";
-import { Search, Edit3, Trash2, UserPlus } from "lucide-react";
+import {
+  Search,
+  Edit3,
+  Trash2,
+  UserPlus,
+  ChevronDown,
+  ChevronUp,
+  Users,
+} from "lucide-react";
 
 // A helper to assign colors to roles for better UI
 const roleColorMap = {
@@ -17,7 +25,8 @@ const RoleBadge = ({ role }) => (
   <span
     className={`px-2 py-1 text-xs font-semibold rounded-full ${
       roleColorMap[role] || "bg-gray-100 text-gray-800"
-    }`}>
+    }`}
+  >
     {role.replace(/_/g, " ")}
   </span>
 );
@@ -28,6 +37,9 @@ export default function FacultyManagement() {
   const [allRoles, setAllRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+
+  // State for grouping
+  const [expandedDepartments, setExpandedDepartments] = useState({});
 
   // State for the "Add New Faculty" form
   const [newFacultyName, setNewFacultyName] = useState("");
@@ -48,7 +60,7 @@ export default function FacultyManagement() {
       ]);
 
       const allUsers = usersRes.data.users || [];
-      // CORRECTED: Filter out users who have the "STUDENT" role.
+      // Filter out users who have the "STUDENT" role.
       const facultyAndStaff = allUsers.filter(
         (user) => !user.roles.some((role) => role.name === "STUDENT")
       );
@@ -56,6 +68,14 @@ export default function FacultyManagement() {
       setUsers(facultyAndStaff);
       setDepartments(deptsRes.data || []);
       setAllRoles(rolesRes.data || []);
+
+      // Automatically expand all departments initially (optional)
+      const initialExpanded = {};
+      if (deptsRes.data) {
+        deptsRes.data.forEach((d) => (initialExpanded[d.name] = true));
+        initialExpanded["Unassigned"] = true;
+      }
+      setExpandedDepartments(initialExpanded);
     } catch (err) {
       console.error("Failed to fetch data:", err);
       if (err.response) console.error("Error Response:", err.response.data);
@@ -121,11 +141,29 @@ export default function FacultyManagement() {
     );
   };
 
+  const toggleDepartment = (deptName) => {
+    setExpandedDepartments((prev) => ({
+      ...prev,
+      [deptName]: !prev[deptName],
+    }));
+  };
+
+  // Filter users based on search term
   const filteredUsers = users.filter(
     (user) =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Group users by department
+  const groupedFaculty = filteredUsers.reduce((acc, user) => {
+    const deptName = user.facultyProfile?.department?.name || "Unassigned";
+    if (!acc[deptName]) {
+      acc[deptName] = [];
+    }
+    acc[deptName].push(user);
+    return acc;
+  }, {});
 
   if (loading)
     return (
@@ -146,86 +184,125 @@ export default function FacultyManagement() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Column 1: Faculty & User List */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Faculty & Staff List
-          </h2>
-          <div className="mb-4 relative">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              size={20}
-            />
-            <input
-              type="text"
-              placeholder="Search by name or email..."
-              className="w-full p-2 pl-10 border rounded-md focus:ring-blue-500 focus:border-blue-500"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+        {/* Column 1: Faculty & User List (Grouped by Department) */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            <div className="relative">
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <input
+                type="text"
+                placeholder="Search by name or email..."
+                className="w-full p-2 pl-10 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Name
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Email
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Department
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Roles
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-4 whitespace-nowrap font-medium text-gray-900">
-                      {user.name}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {user.email}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {user.facultyProfile?.department?.name || "N/A"}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="flex flex-wrap gap-1">
-                        {user.roles.map((role) => (
-                          <RoleBadge key={role.name} role={role.name} />
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                      <button
-                        onClick={() => setSelectedUser(user)}
-                        className="text-blue-600 hover:text-blue-900"
-                        title="Edit Roles">
-                        <Edit3 size={18} />
-                      </button>
-                      <button
-                        className="text-red-600 hover:text-red-900"
-                        title="Delete User">
-                        <Trash2 size={18} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+
+          {Object.keys(groupedFaculty).length > 0 ? (
+            Object.entries(groupedFaculty)
+              .sort(([deptA], [deptB]) => deptA.localeCompare(deptB))
+              .map(([deptName, facultyInDept]) => (
+                <div
+                  key={deptName}
+                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+                >
+                  <button
+                    onClick={() => toggleDepartment(deptName)}
+                    className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center">
+                      <Users className="w-6 h-6 mr-3 text-gray-600" />
+                      <h2 className="text-xl font-semibold text-gray-800">
+                        {deptName}{" "}
+                        <span className="text-base font-normal text-gray-500">
+                          ({facultyInDept.length} staff)
+                        </span>
+                      </h2>
+                    </div>
+                    {expandedDepartments[deptName] ? (
+                      <ChevronUp className="w-6 h-6 text-gray-500" />
+                    ) : (
+                      <ChevronDown className="w-6 h-6 text-gray-500" />
+                    )}
+                  </button>
+
+                  {expandedDepartments[deptName] && (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Name
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Email
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Roles
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {facultyInDept.map((user) => (
+                            <tr key={user.id} className="hover:bg-gray-50">
+                              <td className="px-4 py-4 whitespace-nowrap font-medium text-gray-900">
+                                {user.name}
+                              </td>
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {user.email}
+                              </td>
+                              <td className="px-4 py-4 whitespace-nowrap">
+                                <div className="flex flex-wrap gap-1">
+                                  {user.roles.map((role) => (
+                                    <RoleBadge
+                                      key={role.name}
+                                      role={role.name}
+                                    />
+                                  ))}
+                                </div>
+                              </td>
+                              <td className="px-4 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                <button
+                                  onClick={() => setSelectedUser(user)}
+                                  className="text-blue-600 hover:text-blue-900"
+                                  title="Edit Roles"
+                                >
+                                  <Edit3 size={18} />
+                                </button>
+                                <button
+                                  className="text-red-600 hover:text-red-900"
+                                  title="Delete User"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              ))
+          ) : (
+            <div className="text-center p-12 bg-white rounded-lg border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-700">
+                No Matching Faculty Found
+              </h3>
+            </div>
+          )}
         </div>
 
         {/* Column 2: Add & Manage Forms */}
         <div className="space-y-8">
+          {/* Add Faculty Form */}
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
               Add New Faculty
@@ -263,7 +340,8 @@ export default function FacultyManagement() {
                   value={newFacultyDept}
                   onChange={(e) => setNewFacultyDept(e.target.value)}
                   required
-                  className="mt-1 w-full p-2 border rounded-md">
+                  className="mt-1 w-full p-2 border rounded-md"
+                >
                   <option value="">Select Department</option>
                   {departments.map((dept) => (
                     <option key={dept.id} value={dept.id}>
@@ -274,12 +352,15 @@ export default function FacultyManagement() {
               </div>
               <button
                 type="submit"
-                className="w-full flex justify-center items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                className="w-full flex justify-center items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              >
                 <UserPlus size={18} className="mr-2" />
                 Add Faculty
               </button>
             </form>
           </div>
+
+          {/* Manage Roles Form */}
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
               Manage User Roles
@@ -296,7 +377,8 @@ export default function FacultyManagement() {
                       users.find((u) => u.id === parseInt(e.target.value))
                     )
                   }
-                  className="mt-1 w-full p-2 border rounded-md">
+                  className="mt-1 w-full p-2 border rounded-md"
+                >
                   <option value="">-- Select a user --</option>
                   {users.map((user) => (
                     <option key={user.id} value={user.id}>
@@ -322,7 +404,8 @@ export default function FacultyManagement() {
                         />
                         <label
                           htmlFor={`role-${role.id}`}
-                          className="ml-2 block text-sm text-gray-900">
+                          className="ml-2 block text-sm text-gray-900"
+                        >
                           {role.name.replace(/_/g, " ")}
                         </label>
                       </div>
@@ -333,7 +416,8 @@ export default function FacultyManagement() {
               <button
                 type="submit"
                 disabled={!selectedUser}
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400">
+                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+              >
                 Update Roles
               </button>
             </form>
